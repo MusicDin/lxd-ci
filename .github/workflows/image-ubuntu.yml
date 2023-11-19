@@ -23,8 +23,8 @@ jobs:
           # - bionic
           # - focal
           - jammy
-          - mantic
-          # - noble
+          # - mantic
+          - noble
         architecture:
           - amd64
           # - arm64
