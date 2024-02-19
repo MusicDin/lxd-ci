@@ -22,9 +22,9 @@ jobs:
           - xenial
           # - bionic
           # - focal
-          - jammy
+          # - jammy
           # - mantic
-          - noble
+          # - noble
         architecture:
           - amd64
           # - arm64
