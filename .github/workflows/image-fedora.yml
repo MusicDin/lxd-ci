@@ -19,9 +19,9 @@ jobs:
       fail-fast: false
       matrix:
         release:
-          # - 37
-          - 38
-          - 39
+          - 37
+          # - 38
+          # - 39
         architecture:
           - amd64
           # - arm64
