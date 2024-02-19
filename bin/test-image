@@ -175,10 +175,10 @@ for url in $(lxc query "/1.0/instances" | jq -r .[] | grep "${TEST_IMAGE}"); do
     fi
 
     # Skip Ubuntu noble containers due to cgroup2 being required
-    if [ "${TYPE}" = "container" ] && [ "${DIST}" = "ubuntu" ] && [ "${RELEASE}" = "noble" ]; then
-        echo "===> SKIP: Ubuntu noble container due to cgroup2 requirement: ${name}"
-        continue
-    fi
+    # if [ "${TYPE}" = "container" ] && [ "${DIST}" = "ubuntu" ] && [ "${RELEASE}" = "noble" ]; then
+    #     echo "===> SKIP: Ubuntu noble container due to cgroup2 requirement: ${name}"
+    #     continue
+    # fi
 
     # Systemd cleanliness.
     if lxc exec "${name}" -- sh -c "type systemctl" >/dev/null 2>&1; then
@@ -188,7 +188,7 @@ for url in $(lxc query "/1.0/instances" | jq -r .[] | grep "${TEST_IMAGE}"); do
 
             # Show the systemd failures.
             echo "===> DEBUG: systemd failed: ${name}"
-            lxc exec "${name}" -- systemctl --failed
+            lxc exec "${name}" -- systemctl --failed --all
             FAIL=1
         else
             echo "===> PASS: systemd clean: ${name}"
