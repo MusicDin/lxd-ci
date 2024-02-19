@@ -15,14 +15,6 @@ inputs:
 runs:
   using: composite
   steps:
-    - name: Checkout LXD imagebuilder
-      uses: actions/checkout@v4
-      with:
-        repository: musicdin/lxd-imagebuilder
-        path: lxd-imagebuilder
-        # token: ${{ inputs.token }}
-        ssh-key: ${{ inputs.deploy-key }}
-
     - name: Install dependencies
       shell: bash
       run: |
@@ -45,9 +37,18 @@ runs:
     #   run: |
     #     git clone https://github.com/canonical/lxd-imagebuilder --depth 1
 
+    - name: Checkout LXD imagebuilder
+      uses: actions/checkout@v4
+      with:
+        repository: musicdin/lxd-imagebuilder
+        path: lxd-imagebuilder
+        # token: ${{ inputs.token }}
+        ssh-key: ${{ inputs.deploy-key }}
+
     - name: Build LXD imagebuilder
       shell: bash
       run: |
+        cd lxd-imagebuilder
         make
 
     - name: Setup LXD ${{ inputs.lxd-channel }}
