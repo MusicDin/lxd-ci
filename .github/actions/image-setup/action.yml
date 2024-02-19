@@ -21,6 +21,7 @@ runs:
         sudo apt-get -qq update
         sudo apt-get install -y --no-install-recommends \
             debootstrap \
+            dnf \
             qemu-utils \
             git \
             gpg \
