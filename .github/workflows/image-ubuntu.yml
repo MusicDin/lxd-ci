@@ -20,8 +20,8 @@ jobs:
       matrix:
         release:
           - xenial
-          - bionic
-          - focal
+          # - bionic
+          # - focal
           - jammy
           - mantic
           # - noble
