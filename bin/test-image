@@ -129,7 +129,7 @@ else
             lxc config set "${TEST_IMAGE}-${PRIV}" user.user-data "$(cat << EOF
 #cloud-config
 write_files:
-  - content: "foo\n"
+  - content: "foo"
     path: /user-data
 EOF
 )"
@@ -253,14 +253,14 @@ for url in $(lxc query "/1.0/instances" | jq -r .[] | grep "${TEST_IMAGE}"); do
 
     # Cloud-init testing
     if [ "${VARIANT}" = "cloud" ]; then
-        if [ "$(lxc file pull "${name}/user-data" - 2>/dev/null)" = "foo" ]; then
+        if [ "$(lxc file pull "${name}/user-data" -)" = "foo" ]; then
             echo "===> PASS: cloud-init user-data provisioning: ${name}"
         else
             echo "===> FAIL: cloud-init user-data provisioning: ${name}"
             FAIL=1
         fi
 
-        if [ "$(lxc file pull "${name}/vendor-data" - 2>/dev/null)" = "bar" ]; then
+        if [ "$(lxc file pull "${name}/vendor-data" -)" = "bar" ]; then
             echo "===> PASS: cloud-init vendor-data provisioning: ${name}"
         else
             echo "===> FAIL: cloud-init vendor-data provisioning: ${name}"
