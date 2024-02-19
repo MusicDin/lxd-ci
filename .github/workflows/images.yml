@@ -15,13 +15,25 @@ concurrency:
 jobs:
   alpine:
     uses: ./.github/workflows/image-alpine.yml
+    secrets:
+      DEPLOY_KEY: ${{ secrets.GH_KEY }}
   busybox:
     uses: ./.github/workflows/image-busybox.yml
+    secrets:
+      DEPLOY_KEY: ${{ secrets.GH_KEY }}
   centos:
     uses: ./.github/workflows/image-centos.yml
+    secrets:
+      DEPLOY_KEY: ${{ secrets.GH_KEY }}
   debian:
     uses: ./.github/workflows/image-debian.yml
+    secrets:
+      DEPLOY_KEY: ${{ secrets.GH_KEY }}
   fedora:
     uses: ./.github/workflows/image-fedora.yml
+    secrets:
+      DEPLOY_KEY: ${{ secrets.GH_KEY }}
   ubuntu:
     uses: ./.github/workflows/image-ubuntu.yml
+    secrets:
+      DEPLOY_KEY: ${{ secrets.GH_KEY }}
