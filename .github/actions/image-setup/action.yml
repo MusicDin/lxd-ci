@@ -4,7 +4,7 @@ description: Composite action that sets up the environment for building and test
 inputs:
   lxd-channel:
     description: LXD snap channel to install
-    default: latest/edge
+    default: 5.21/stable
   go-version:
     description: Go version to install
     default: 1.22.x
