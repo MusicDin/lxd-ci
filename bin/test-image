@@ -199,8 +199,8 @@ for url in $(lxc query "/1.0/instances" | jq -r .[] | grep "${TEST_IMAGE}"); do
 
     # DEBUG...
     if [ "${DIST}" = "centos" ] || [ "${DIST}" = "rockylinux" ]; then
-        lxc exec "${TEST_IMAGE}" -- systemctl status network.service
-        lxc exec "${TEST_IMAGE}" -- journalctl -u network.service
+        lxc exec "${name}" -- systemctl status network.service
+        lxc exec "${name}" -- journalctl -u network.service
     fi
 
     # Get the addresses.
