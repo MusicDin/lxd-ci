@@ -16,7 +16,7 @@ jobs:
       fail-fast: false
       matrix:
         release:
-          - 7
+          # - 7 # Required ubuntu-20.04
           - 8-Stream
           # - 9-Stream
         architecture:
