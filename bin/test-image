@@ -126,7 +126,7 @@ else
 
         # Cloud-init testing.
         if [ "${VARIANT}" = "cloud" ]; then
-            lxc config set "${TEST_IMAGE}-${PRIV}" user.user-data "$(cat << EOF
+            lxc config set "${TEST_IMAGE}-${PRIV}" cloud-init.user-data "$(cat << EOF
 #cloud-config
 write_files:
   - content: "foo"
@@ -134,7 +134,7 @@ write_files:
 EOF
 )"
 
-            lxc config set "${TEST_IMAGE}-${PRIV}" user.vendor-data "$(cat << EOF
+            lxc config set "${TEST_IMAGE}-${PRIV}" cloud-init.vendor-data "$(cat << EOF
 #cloud-config
 bootcmd:
   - "echo bar > /vendor-data"
@@ -195,6 +195,12 @@ for url in $(lxc query "/1.0/instances" | jq -r .[] | grep "${TEST_IMAGE}"); do
         fi
     else
         echo "===> SKIP: systemd clean: ${name}"
+    fi
+
+    # DEBUG...
+    if [ "${DIST}" = "centos" ] || [ "${DIST}" = "rockylinux" ]; then
+        lxc exec "${TEST_IMAGE}" -- systemctl status network.service
+        lxc exec "${TEST_IMAGE}" -- journalctl -u network.service
     fi
 
     # Get the addresses.
