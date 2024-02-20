@@ -13,6 +13,10 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  almalinux:
+    uses: ./.github/workflows/image-almalinux.yml
+    secrets:
+      DEPLOY_KEY: ${{ secrets.GH_KEY }}
   # alpine:
   #   uses: ./.github/workflows/image-alpine.yml
   #   secrets:
