@@ -171,7 +171,7 @@ lxc list
 sleep 1m
 
 # Check that all instances have an IPv4 and IPv6 address
-echo "=> Performing network tests"
+echo "=> Performing tests"
 FAIL=0
 for url in $(lxc query "/1.0/instances" | jq -r .[]); do
     name=$(echo "${url}" | cut -d/ -f4)
@@ -238,12 +238,12 @@ for url in $(lxc query "/1.0/instances" | jq -r .[]); do
     # DNS resolution
     DNS=0
     for i in $(seq 3); do
-        if lxc exec "${name}" -- getent hosts linuxcontainers.org >/dev/null 2>&1; then
+        if lxc exec "${name}" -- getent hosts canonical.com >/dev/null 2>&1; then
             DNS=1
             break
         fi
 
-        if lxc exec "${name}" -- ping -c1 -W1 linuxcontainers.org >/dev/null 2>&1; then
+        if lxc exec "${name}" -- ping -c1 -W1 canonical.com >/dev/null 2>&1; then
             DNS=1
             break
         fi
