@@ -74,6 +74,9 @@ jobs:
   kali:
     uses: ./.github/workflows/image-kali.yml
     secrets: inherit
+  mint:
+    uses: ./.github/workflows/image-mint.yml
+    secrets: inherit
   # opensuse:
   #   uses: ./.github/workflows/image-opensuse.yml
   #   secrets: inherit
