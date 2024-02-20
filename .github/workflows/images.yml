@@ -50,10 +50,10 @@ jobs:
   #     - name: Debug
   #       run: ls -lah lxd-imagebuilder2
 
-  almalinux:
-    uses: ./.github/workflows/image-almalinux.yml
-    secrets:
-      DEPLOY_KEY: ${{ secrets.GH_KEY }}
+  # almalinux:
+  #   uses: ./.github/workflows/image-almalinux.yml
+  #   secrets:
+  #     DEPLOY_KEY: ${{ secrets.GH_KEY }}
   # alpine:
   #   uses: ./.github/workflows/image-alpine.yml
   #   secrets:
