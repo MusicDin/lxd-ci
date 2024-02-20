@@ -33,6 +33,10 @@ jobs:
     uses: ./.github/workflows/image-fedora.yml
     secrets:
       DEPLOY_KEY: ${{ secrets.GH_KEY }}
+  RockyLinux:
+    uses: ./.github/workflows/image-rockylinux.yml
+    secrets:
+      DEPLOY_KEY: ${{ secrets.GH_KEY }}
   ubuntu:
     uses: ./.github/workflows/image-ubuntu.yml
     secrets:
