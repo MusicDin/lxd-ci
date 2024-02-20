@@ -15,14 +15,14 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        architecture:
-          - amd64
-          # - arm64
         release:
           - current
         variant:
           - openrc
           - systemd
+        architecture:
+          - amd64
+          # - arm64
     env:
       type: "container"
       distro: "${{ github.job }}"
