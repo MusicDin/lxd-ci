@@ -8,9 +8,6 @@ on:
         type: boolean
         default: false
         description: Publish built image
-    secrets:
-      DEPLOY_KEY:
-        required: true
 
 jobs:
   busybox:
@@ -36,7 +33,7 @@ jobs:
       - name: Setup environment
         uses: ./.github/actions/image-setup
         with:
-          deploy-key: ${{ secrets.DEPLOY_KEY }}
+          deploy-key: ${{ secrets.GH_KEY }}
 
       - name: Build image
         run: |

@@ -52,33 +52,25 @@ jobs:
 
   # almalinux:
   #   uses: ./.github/workflows/image-almalinux.yml
-  #   secrets:
-  #     DEPLOY_KEY: ${{ secrets.GH_KEY }}
+  #   secrets: inherit
   # alpine:
   #   uses: ./.github/workflows/image-alpine.yml
-  #   secrets:
-  #     DEPLOY_KEY: ${{ secrets.GH_KEY }}
+  #   secrets: inherit
   # busybox:
   #   uses: ./.github/workflows/image-busybox.yml
-  #   secrets:
-  #     DEPLOY_KEY: ${{ secrets.GH_KEY }}
+  #   secrets: inherit
   centos:
     uses: ./.github/workflows/image-centos.yml
-    secrets:
-      DEPLOY_KEY: ${{ secrets.GH_KEY }}
+    secrets: inherit
   # debian:
   #   uses: ./.github/workflows/image-debian.yml
-  #   secrets:
-  #     DEPLOY_KEY: ${{ secrets.GH_KEY }}
+  #   secrets: inherit
   # fedora:
   #   uses: ./.github/workflows/image-fedora.yml
-  #   secrets:
-  #     DEPLOY_KEY: ${{ secrets.GH_KEY }}
+  #   secrets: inherit
   RockyLinux:
     uses: ./.github/workflows/image-rockylinux.yml
-    secrets:
-      DEPLOY_KEY: ${{ secrets.GH_KEY }}
+    secrets: inherit
   ubuntu:
     uses: ./.github/workflows/image-ubuntu.yml
-    secrets:
-      DEPLOY_KEY: ${{ secrets.GH_KEY }}
+    secrets: inherit
