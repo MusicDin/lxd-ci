@@ -13,6 +13,43 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  # debug:
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - name: Checkout
+  #       uses: actions/checkout@v4
+
+  #     # - name: Install git
+  #     #   run: |
+  #     #     sudo apt-get install -y git
+
+  #     - name: Print Key length
+  #       env:
+  #         KEY: "${{ secrets.GH_KEY }}"
+  #       run: |
+  #         echo "Length: ${#KEY}"
+
+  #     - name: Checkout LXD imagebuilder manually
+  #       if: always()
+  #       run: |
+  #         eval "$(ssh-agent -s)"
+  #         echo "${{ secrets.GH_KEY }}" > test.pk
+  #         sudo chmod 600 test.pk
+  #         ssh-add test.pk
+  #         git clone git@github.com:musicdin/lxd-imagebuilder.git
+  #         ls -lah lxd-imagebuilder
+
+  #     - name: Checkout LXD imagebuilder
+  #       uses: actions/checkout@v4
+  #       if: always()
+  #       with:
+  #         repository: musicdin/lxd-imagebuilder
+  #         path: lxd-imagebuilder2
+  #         ssh-key: "${{ secrets.GH_KEY }}"
+
+  #     - name: Debug
+  #       run: ls -lah lxd-imagebuilder2
+
   almalinux:
     uses: ./.github/workflows/image-almalinux.yml
     secrets:
