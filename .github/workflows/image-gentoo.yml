@@ -52,7 +52,8 @@ jobs:
           ./bin/build-distro "${YAML}" "${ARCH}" "${TYPE}" "${TIMEOUT}" "${{ env.target }}" \
               -o image.architecture="${IMAGE_ARCH}" \
               -o image.release=${{ matrix.release }} \
-              -o image.variant=${{ matrix.variant }}
+              -o image.variant=${{ matrix.variant }} \
+              -o source.variant=${{ matrix.variant }}
 
       - name: Print build artifacts
         run: ls -lah "${{ env.target }}"

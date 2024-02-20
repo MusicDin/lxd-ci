@@ -71,15 +71,15 @@ jobs:
   # debian:
   #   uses: ./.github/workflows/image-debian.yml
   #   secrets: inherit
-  devuan:
-    uses: ./.github/workflows/image-devuan.yml
-    secrets: inherit
+  # devuan:
+  #   uses: ./.github/workflows/image-devuan.yml
+  #   secrets: inherit
   # fedora:
   #   uses: ./.github/workflows/image-fedora.yml
   #   secrets: inherit
-  funtoo:
-    uses: ./.github/workflows/image-funtoo.yml
-    secrets: inherit
+  # funtoo:
+  #   uses: ./.github/workflows/image-funtoo.yml
+  #   secrets: inherit
   gentoo:
     uses: ./.github/workflows/image-gentoo.yml
     secrets: inherit
