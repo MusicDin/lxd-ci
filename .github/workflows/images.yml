@@ -71,6 +71,9 @@ jobs:
   # fedora:
   #   uses: ./.github/workflows/image-fedora.yml
   #   secrets: inherit
+  kali:
+    uses: ./.github/workflows/image-kali.yml
+    secrets: inherit
   # opensuse:
   #   uses: ./.github/workflows/image-opensuse.yml
   #   secrets: inherit
