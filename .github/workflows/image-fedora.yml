@@ -20,8 +20,8 @@ jobs:
       matrix:
         release:
           - 37
-          # - 38
-          # - 39
+          - 38
+          - 39
         architecture:
           - amd64
           # - arm64
