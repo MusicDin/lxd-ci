@@ -56,6 +56,9 @@ jobs:
   # alpine:
   #   uses: ./.github/workflows/image-alpine.yml
   #   secrets: inherit
+  alt:
+    uses: ./.github/workflows/image-alt.yml
+    secrets: inherit
   # archlinux:
   #   uses: ./.github/workflows/image-archlinux.yml
   #   secrets: inherit
