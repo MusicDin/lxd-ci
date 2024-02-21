@@ -1,4 +1,4 @@
-name: Build OpenEuler Images
+name: Build Oracle Images
 
 on:
   workflow_dispatch:
@@ -10,15 +10,15 @@ on:
         description: Publish built image
 
 jobs:
-  openeuler:
+  oracle:
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
         release:
-          - 20.03
-          - 22.03
-          - 23.03
+          - 7
+          - 8
+          - 9
         variant:
           - default
           - cloud
@@ -38,13 +38,6 @@ jobs:
         with:
           deploy-key: ${{ secrets.GH_KEY }}
 
-      - name: Determine image types
-        run: |
-          ARCH="${{ matrix.architecture }}"
-          if [ "${ARCH}" = "amd64" ]; then
-              echo "type=container,vm" >> $GITHUB_ENV
-          fi
-
       - name: Build image
         run: |
           TIMEOUT=3600
@@ -55,6 +48,11 @@ jobs:
           IMAGE_ARCH="${ARCH}"
           [ "${ARCH}" = "amd64" ] && IMAGE_ARCH="x86_64"
           [ "${ARCH}" = "arm64" ] && IMAGE_ARCH="aarch64"
+
+          EXTRA_ARGS=""
+          if [ "${{ matrix.release }}" = "9" ]; then
+              EXTRA_ARGS="-o source.url=https://yum.oracle.com/ISOS/OracleLinux"
+          fi
 
           ./bin/build-distro "${YAML}" "${ARCH}" "${TYPE}" "${TIMEOUT}" "${{ env.target }}" \
               -o image.architecture="${IMAGE_ARCH}" \

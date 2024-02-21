@@ -104,12 +104,15 @@ jobs:
   # openwrt:
   #   uses: ./.github/workflows/image-openwrt.yml
   #   secrets: inherit
+  oracle:
+    uses: ./.github/workflows/image-oracle.yml
+    secrets: inherit
   # RockyLinux:
   #   uses: ./.github/workflows/image-rockylinux.yml
   #   secrets: inherit
-  springdalelinux:
-    uses: ./.github/workflows/image-springdalelinux.yml
-    secrets: inherit
+  # springdalelinux:
+  #   uses: ./.github/workflows/image-springdalelinux.yml
+  #   secrets: inherit
   # ubuntu:
   #   uses: ./.github/workflows/image-ubuntu.yml
   #   secrets: inherit
