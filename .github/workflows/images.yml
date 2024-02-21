@@ -86,9 +86,9 @@ jobs:
   # kali:
   #   uses: ./.github/workflows/image-kali.yml
   #   secrets: inherit
-  mint:
-    uses: ./.github/workflows/image-mint.yml
-    secrets: inherit
+  # mint:
+  #   uses: ./.github/workflows/image-mint.yml
+  #   secrets: inherit
   nixos:
     uses: ./.github/workflows/image-nixos.yml
     secrets: inherit
@@ -104,3 +104,6 @@ jobs:
   # ubuntu:
   #   uses: ./.github/workflows/image-ubuntu.yml
   #   secrets: inherit
+  voidlinux:
+    uses: ./.github/workflows/image-voidlinux.yml
+    secrets: inherit

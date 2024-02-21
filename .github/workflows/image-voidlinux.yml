@@ -1,4 +1,4 @@
-name: Build Linux Mint Images
+name: Build VoidLinux Images
 
 on:
   workflow_dispatch:
@@ -10,24 +10,19 @@ on:
         description: Publish built image
 
 jobs:
-  mint:
+  voidlinux:
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
         release:
-          - ulyana
-          - ulyssa
-          - uma
-          # - una
-          # - vanessa
-          - vera
-          - victoria
+          - unstable
+          - 23.11
         variant:
           - default
-          - cloud
         architecture:
           - amd64
+          # - arm64
     env:
       type: "container"
       distro: "${{ github.job }}"
@@ -47,18 +42,21 @@ jobs:
           YAML="${{ github.workspace }}/images/${{ env.distro }}.yaml"
           ARCH="${{ matrix.architecture }}"
           TYPE="${{ env.type }}"
-          RELEASE="${{ matrix.release}}"
+          VARIANT=${{ matrix.variant }}
 
-          SUITE="jammy"
-          if [ "${RELEASE}" = "ulyana" ] || [ "${RELEASE}" = "ulyssa" ] || [ "${RELEASE}" = "uma" ] || [ "${RELEASE}" = "una" ]; then
-              SUITE=focal
+          IMAGE_ARCH=${ARCH}
+          [ "${ARCH}" = "amd64" ] && IMAGE_ARCH="x86_64"
+          [ "${ARCH}" = "arm64" ] && IMAGE_ARCH="aarch64"
+
+          EXTRA_ARGS=""
+          if [ "${VARIANT}" != "default" ]; then
+                EXTRA_ARGS="-o image.variant=${VARIANT} -o source.variant=${VARIANT}"
           fi
 
           ./bin/build-distro "${YAML}" "${ARCH}" "${TYPE}" "${TIMEOUT}" "${{ env.target }}" \
-              -o image.architecture="${ARCH}" \
+              -o image.architecture="${IMAGE_ARCH}" \
               -o image.release=${{ matrix.release }} \
-              -o image.variant=${{ matrix.variant }} \
-              -o source.suite="${SUITE}"
+              -o source.url="https://mirrors.servercentral.com/voidlinux/live/current/"
 
       - name: Print build artifacts
         run: ls -lah "${{ env.target }}"
