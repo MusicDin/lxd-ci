@@ -61,7 +61,7 @@ jobs:
           [ "${ARCH}" = "amd64" ] && IMAGE_ARCH="x86_64"
           [ "${ARCH}" = "arm64" ] && IMAGE_ARCH="aarch64"
 
-          EXTRA_ARGS="-o source.variant=boot"
+          EXTRA_ARGS="-o image.variant=${{ matrix.variant }}"
           if [ ${ARCH} = "arm64" ]; then
               EXTRA_ARGS="-o source.url=http://os.archlinuxarm.org"
           fi
