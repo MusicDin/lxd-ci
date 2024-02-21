@@ -11,7 +11,7 @@ on:
 
 jobs:
   openwrt:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
@@ -81,3 +81,8 @@ jobs:
         with:
           name: "${{ env.distro }}-${{ matrix.release }}-${{ matrix.architecture }}-${{ matrix.variant }}"
           target: ${{ env.target }}
+
+      - name: Tmate debugging session (gh-hosted)
+        if: failure()
+        uses: mxschmitt/action-tmate@v3
+        timeout-minutes: 15

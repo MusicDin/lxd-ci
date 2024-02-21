@@ -111,4 +111,8 @@ jobs:
         with:
           name: "${{ env.distro }}-${{ matrix.release }}-${{ matrix.architecture }}-${{ matrix.variant }}"
           target: ${{ env.target }}
-          # types: ${{ env.type }}
+
+      - name: Tmate debugging session (gh-hosted)
+        if: failure()
+        uses: mxschmitt/action-tmate@v3
+        timeout-minutes: 15
