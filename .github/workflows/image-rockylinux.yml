@@ -11,19 +11,19 @@ on:
 
 jobs:
   rockylinux:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
         release:
           - 8
-          # - 9
-        architecture:
-          - amd64
-          # - arm64
+          - 9
         variant:
           - default
           - cloud
+        architecture:
+          - amd64
+          # - arm64
     env:
       type: ""
       distro: "${{ github.job }}"
@@ -65,8 +65,7 @@ jobs:
 
       - name: Test container image
         uses: ./.github/actions/image-test
-        # if: contains(env.type, 'container')
-        if: always()
+        if: contains(env.type, 'container')
         with:
           type: container
           target: ${{ env.target }}
@@ -76,8 +75,7 @@ jobs:
 
       - name: Test VM image
         uses: ./.github/actions/image-test
-        # if: contains(env.type, 'vm')
-        if: always()
+        if: contains(env.type, 'vm')
         with:
           type: vm
           target: ${{ env.target }}
@@ -92,7 +90,7 @@ jobs:
           name: "${{ env.distro }}-${{ matrix.release }}-${{ matrix.architecture }}-${{ matrix.variant }}"
           target: ${{ env.target }}
 
-      - name: Tmate debugging session (gh-hosted)
-        if: failure()
-        uses: mxschmitt/action-tmate@v3
-        timeout-minutes: 15
+      # - name: Tmate debugging session (gh-hosted)
+      #   if: failure()
+      #   uses: mxschmitt/action-tmate@v3
+      #   timeout-minutes: 15
