@@ -59,6 +59,9 @@ jobs:
   # alt:
   #   uses: ./.github/workflows/image-alt.yml
   #   secrets: inherit
+  amazonlinux:
+    uses: ./.github/workflows/image-amazonlinux.yml
+    secrets: inherit
   # archlinux:
   #   uses: ./.github/workflows/image-archlinux.yml
   #   secrets: inherit
