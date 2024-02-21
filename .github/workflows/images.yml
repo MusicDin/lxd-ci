@@ -95,9 +95,9 @@ jobs:
   # nixos:
   #   uses: ./.github/workflows/image-nixos.yml
   #   secrets: inherit
-  openeuler:
-    uses: ./.github/workflows/image-openeuler.yml
-    secrets: inherit
+  # openeuler:
+  #   uses: ./.github/workflows/image-openeuler.yml
+  #   secrets: inherit
   # opensuse:
   #   uses: ./.github/workflows/image-opensuse.yml
   #   secrets: inherit

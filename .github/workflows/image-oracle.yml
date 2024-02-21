@@ -11,7 +11,7 @@ on:
 
 jobs:
   oracle:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     strategy:
       fail-fast: false
       matrix:
@@ -57,7 +57,8 @@ jobs:
           ./bin/build-distro "${YAML}" "${ARCH}" "${TYPE}" "${TIMEOUT}" "${{ env.target }}" \
               -o image.architecture="${IMAGE_ARCH}" \
               -o image.release=${{ matrix.release }} \
-              -o image.variant=${{ matrix.variant }}
+              -o image.variant=${{ matrix.variant }} \
+              ${EXTRA_ARGS}
 
       - name: Print build artifacts
         run: ls -lah "${{ env.target }}"
