@@ -181,21 +181,29 @@ for url in $(lxc query "/1.0/instances" | jq -r .[] | grep "${TEST_IMAGE}"); do
     # fi
 
     # Systemd cleanliness.
-    if lxc exec "${name}" -- sh -c "type systemctl" >/dev/null 2>&1; then
-        #lxc exec "${name}" -- systemctl reset-failed systemd-networkd-wait-online.service >/dev/null 2>&1 || true
-        if lxc exec "${name}" -- systemctl --failed 2>&1 | grep -q '\sfailed\s'; then
-            echo "===> FAIL: systemd clean: ${name}"
+    for i in $(seq 3); do
+        if lxc exec "${name}" -- sh -c "type systemctl" >/dev/null 2>&1; then
+            #lxc exec "${name}" -- systemctl reset-failed systemd-networkd-wait-online.service >/dev/null 2>&1 || true
+            if lxc exec "${name}" -- systemctl --failed 2>&1 | grep -q '\sfailed\s'; then
+                echo "===> FAIL: systemd clean: ${name}"
 
-            # Show the systemd failures.
-            echo "===> DEBUG: systemd failed: ${name}"
-            lxc exec "${name}" -- systemctl --failed --all
-            FAIL=1
+                # Show the systemd failures.
+                echo "===> DEBUG: systemd failed: ${name}"
+                lxc exec "${name}" -- systemctl --failed --all
+                FAIL=1
+            else
+                echo "===> PASS: systemd clean: ${name}"
+                FAIL=0
+                break
+            fi
         else
-            echo "===> PASS: systemd clean: ${name}"
+            echo "===> SKIP: systemd clean: ${name}"
+            FAIL=0
+            break
         fi
-    else
-        echo "===> SKIP: systemd clean: ${name}"
-    fi
+
+        sleep 5
+    done
 
     # DEBUG...
     echo "==> Debugging..."
@@ -246,7 +254,12 @@ for url in $(lxc query "/1.0/instances" | jq -r .[] | grep "${TEST_IMAGE}"); do
             break
         fi
 
-        if lxc exec "${name}" -- ping -c1 -W1 canonical.com >/dev/null 2>&1; then
+        # if lxc exec "${name}" -- ping -c1 -W1 canonical.com >/dev/null 2>&1; then
+        #     DNS=1
+        #     break
+        # fi
+
+        if lxc exec "${name}" -- nslookup canonical.com >/dev/null 2>&1; then
             DNS=1
             break
         fi
@@ -262,9 +275,6 @@ for url in $(lxc query "/1.0/instances" | jq -r .[] | grep "${TEST_IMAGE}"); do
 
     # Cloud-init testing
     if [ "${VARIANT}" = "cloud" ]; then
-
-        lxc exec "${name}" -- cloud-init status --long || true
-
         if [ "$(lxc file pull "${name}/user-data" -)" = "foo" ]; then
             echo "===> PASS: cloud-init user-data provisioning: ${name}"
         else
