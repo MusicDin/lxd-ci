@@ -107,6 +107,9 @@ jobs:
   # RockyLinux:
   #   uses: ./.github/workflows/image-rockylinux.yml
   #   secrets: inherit
+  springdalelinux:
+    uses: ./.github/workflows/image-springdalelinux.yml
+    secrets: inherit
   # ubuntu:
   #   uses: ./.github/workflows/image-ubuntu.yml
   #   secrets: inherit
