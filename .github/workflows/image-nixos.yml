@@ -51,6 +51,7 @@ jobs:
           JOBSET="release-${RELEASE}"
           [ "${RELEASE}" = "unstable" ] && JOBSET="trunk-combined"
 
+          mkdir -p ${{ env.target }}
           curl --location --output ${{ env.target }}/disk.qcow2 https://hydra.nixos.org/job/nixos/${JOBSET}/nixos.lxdVirtualMachineImage.${ARCH}-linux/latest/download-by-type/file/qcow2-image
 
           ./bin/build-distro "${YAML}" "${ARCH}" "${TYPE}" "${TIMEOUT}" "${{ env.target }}" \
