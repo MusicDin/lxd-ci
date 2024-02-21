@@ -24,7 +24,7 @@ jobs:
           - amd64
           # - arm64
     env:
-      type: ""
+      type: "container"
       distro: "${{ github.job }}"
       target: "${HOME}/build"
 
