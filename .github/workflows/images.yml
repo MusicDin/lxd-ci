@@ -65,9 +65,9 @@ jobs:
   # busybox:
   #   uses: ./.github/workflows/image-busybox.yml
   #   secrets: inherit
-  centos:
-    uses: ./.github/workflows/image-centos.yml
-    secrets: inherit
+  # centos:
+  #   uses: ./.github/workflows/image-centos.yml
+  #   secrets: inherit
   # debian:
   #   uses: ./.github/workflows/image-debian.yml
   #   secrets: inherit
@@ -86,18 +86,18 @@ jobs:
   # kali:
   #   uses: ./.github/workflows/image-kali.yml
   #   secrets: inherit
-  # mint:
-  #   uses: ./.github/workflows/image-mint.yml
-  #   secrets: inherit
+  mint:
+    uses: ./.github/workflows/image-mint.yml
+    secrets: inherit
   # opensuse:
   #   uses: ./.github/workflows/image-opensuse.yml
   #   secrets: inherit
   # openwrt:
   #   uses: ./.github/workflows/image-openwrt.yml
   #   secrets: inherit
-  RockyLinux:
-    uses: ./.github/workflows/image-rockylinux.yml
-    secrets: inherit
+  # RockyLinux:
+  #   uses: ./.github/workflows/image-rockylinux.yml
+  #   secrets: inherit
   # ubuntu:
   #   uses: ./.github/workflows/image-ubuntu.yml
   #   secrets: inherit
