@@ -119,3 +119,6 @@ jobs:
   voidlinux:
     uses: ./.github/workflows/image-voidlinux.yml
     secrets: inherit
+  slackware:
+    uses: ./.github/workflows/image-slackware.yml
+    secrets: inherit
