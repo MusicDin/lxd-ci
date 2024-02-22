@@ -23,6 +23,7 @@ waitInstanceReady() (
   processes=0
   for _ in $(seq "${maxWait}"); do
       processes="$(lxc info --project "${instProj}" "${instName}" | awk '{if ($1 == "Processes:") print $2}')"
+      echo ">> [ Debug ] Processes (${instName}): ${processes}"
       if [ "${processes}" -gt 1 ]; then
           return 0 # Success.
       fi
@@ -209,7 +210,9 @@ done
 
 echo "==> Waiting for instances to start"
 for i in ${INSTANCES}; do
-    waitInstanceReady "${i}"
+    waitInstanceReady "${i}" || true
+    lxc info "${i}"
+    lxc ls
 done
 
 # [ "${TYPE}" = "container" ] && sleep 1m
