@@ -24,7 +24,7 @@ waitInstanceReady() (
   for _ in $(seq "${maxWait}"); do
       processes="$(lxc info --project "${instProj}" "${instName}" | awk '{if ($1 == "Processes:") print $2}')"
       echo ">> [ Debug ] Processes (${instName}): ${processes}"
-      if [ "${processes}" -gt 1 ]; then
+      if [ "${processes}" -gt 0 ]; then
           return 0 # Success.
       fi
       sleep 1
@@ -210,7 +210,13 @@ done
 
 echo "==> Waiting for instances to start"
 for i in ${INSTANCES}; do
-    waitInstanceReady "${i}" || true
+    if lxc exec "${i}" -- sh -c "type systemctl" >/dev/null 2>&1; then
+        waitInstanceBooted "${i}"
+    else
+        waitInstanceReady "${i}" || true
+        sleep 15 # Give instance some extra time to boot properly.
+    fi
+
     lxc info "${i}"
     lxc ls
 done
