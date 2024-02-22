@@ -24,7 +24,7 @@ waitInstanceReady() (
   for _ in $(seq "${maxWait}"); do
       processes="$(lxc info --project "${instProj}" "${instName}" | awk '{if ($1 == "Processes:") print $2}')"
       echo ">> [ Debug ] Processes (${instName}): ${processes}"
-      if [ "${processes}" -gt 0 ]; then
+      if [ "${processes}" -gt 1 ]; then
           return 0 # Success.
       fi
       sleep 1
@@ -210,10 +210,14 @@ done
 
 echo "==> Waiting for instances to start"
 for i in ${INSTANCES}; do
-    if lxc exec "${i}" -- sh -c "type systemctl" >/dev/null 2>&1; then
+    if lxc exec "${i}" -- sh -c "[ -d /run/systemd ]"; then
+        echo ">> [ SYSTEMD DETECTED ] Waiting to boot ..."
         waitInstanceBooted "${i}"
     else
-        waitInstanceReady "${i}" || true
+        echo ">> !! [ NON-SYSTEMD DETECTED ] Waiting for instance to be ready ..."
+        waitInstanceReady "${i}"
+
+        echo ">> !! [ NON-SYSTEMD DETECTED ] Sleeping ..."
         sleep 15 # Give instance some extra time to boot properly.
     fi
 
@@ -256,7 +260,7 @@ for url in $(lxc query "/1.0/instances" | jq -r .[] | grep "${TEST_IMAGE}"); do
 
     # Systemd cleanliness.
     for i in $(seq 3); do
-        if lxc exec "${name}" -- sh -c "type systemctl" >/dev/null 2>&1; then
+        if lxc exec "${name}" -- sh -c "[ -d /run/systemd ]"; then
             #lxc exec "${name}" -- systemctl reset-failed systemd-networkd-wait-online.service >/dev/null 2>&1 || true
             if lxc exec "${name}" -- systemctl --failed 2>&1 | grep -q '\sfailed\s'; then
                 echo "===> FAIL: systemd clean: ${name}"
