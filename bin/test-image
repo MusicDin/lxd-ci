@@ -1,6 +1,9 @@
 #!/bin/sh
 set -eu
 
+# Source helpers script.
+. "$(dirname "${0}")/helpers"
+
 # Check input arguments.
 if [ "${1:-}" = "" ] || [ "${2:-}" = "" ] || [ "${3:-}" = "" ] || [ "${4:-}" = "" ] || [ "${5:-}" = "" ]; then
     echo "Usage: ${0} <type> <distribution> <release> <variant> <target dir>"
@@ -150,10 +153,14 @@ for i in ${INSTANCES}; do
     lxc start "${i}"
 done
 
-# Wait for things to settle.
 echo "==> Waiting for instances to start"
-[ "${TYPE}" = "container" ] && sleep 1m
-[ "${TYPE}" = "vm" ] && sleep 3m
+for i in ${INSTANCES}; do
+    waitInstanceBooted "${i}"
+done
+
+# [ "${TYPE}" = "container" ] && sleep 1m
+# [ "${TYPE}" = "vm" ] && sleep 3m
+
 lxc list "${TEST_IMAGE}"
 
 # Check that all instances have an IPv4 and IPv6 address.

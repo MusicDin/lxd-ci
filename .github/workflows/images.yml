@@ -59,15 +59,15 @@ jobs:
   # alt:
   #   uses: ./.github/workflows/image-alt.yml
   #   secrets: inherit
-  amazonlinux:
-    uses: ./.github/workflows/image-amazonlinux.yml
-    secrets: inherit
+  # amazonlinux:
+  #   uses: ./.github/workflows/image-amazonlinux.yml
+  #   secrets: inherit
   # archlinux:
   #   uses: ./.github/workflows/image-archlinux.yml
   #   secrets: inherit
-  # busybox:
-  #   uses: ./.github/workflows/image-busybox.yml
-  #   secrets: inherit
+  busybox:
+    uses: ./.github/workflows/image-busybox.yml
+    secrets: inherit
   # centos:
   #   uses: ./.github/workflows/image-centos.yml
   #   secrets: inherit
@@ -104,9 +104,9 @@ jobs:
   # openwrt:
   #   uses: ./.github/workflows/image-openwrt.yml
   #   secrets: inherit
-  oracle:
-    uses: ./.github/workflows/image-oracle.yml
-    secrets: inherit
+  # oracle:
+  #   uses: ./.github/workflows/image-oracle.yml
+  #   secrets: inherit
   # RockyLinux:
   #   uses: ./.github/workflows/image-rockylinux.yml
   #   secrets: inherit
