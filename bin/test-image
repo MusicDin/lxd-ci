@@ -11,7 +11,7 @@ set -eu
 # waitInstanceReady: waits for the instance to be ready (processes count > 1).
 waitInstanceReady() (
   set +x
-  maxWait=90
+  maxWait=150
   instName="${1}"
   instProj="${2:-}"
   if [ -z "${instProj}" ]; then
@@ -24,7 +24,7 @@ waitInstanceReady() (
   for _ in $(seq "${maxWait}"); do
       processes="$(lxc info --project "${instProj}" "${instName}" | awk '{if ($1 == "Processes:") print $2}')"
       echo ">> [ Debug ] Processes (${instName}): ${processes}"
-      if [ "${processes}" -gt 1 ]; then
+      if [ "${processes}" -gt 0 ]; then
           return 0 # Success.
       fi
       sleep 1
@@ -210,20 +210,12 @@ done
 
 echo "==> Waiting for instances to start"
 for i in ${INSTANCES}; do
-    if lxc exec "${i}" -- sh -c "[ -d /run/systemd ]"; then
-        echo ">> [ SYSTEMD DETECTED ] Waiting to boot ..."
-        waitInstanceBooted "${i}"
-    else
-        echo ">> !! [ NON-SYSTEMD DETECTED ] Waiting for instance to be ready ..."
-        waitInstanceReady "${i}"
-
-        echo ">> !! [ NON-SYSTEMD DETECTED ] Sleeping ..."
-        sleep 15 # Give instance some extra time to boot properly.
-    fi
-
+    waitInstanceReady "${i}"
     lxc info "${i}"
-    lxc ls
 done
+
+# Give instances some extra time to boot properly.
+sleep 15
 
 # [ "${TYPE}" = "container" ] && sleep 1m
 # [ "${TYPE}" = "vm" ] && sleep 3m
