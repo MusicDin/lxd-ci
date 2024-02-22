@@ -53,9 +53,9 @@ jobs:
   # almalinux:
   #   uses: ./.github/workflows/image-almalinux.yml
   #   secrets: inherit
-  alpine:
-    uses: ./.github/workflows/image-alpine.yml
-    secrets: inherit
+  # alpine:
+  #   uses: ./.github/workflows/image-alpine.yml
+  #   secrets: inherit
   # alt:
   #   uses: ./.github/workflows/image-alt.yml
   #   secrets: inherit
@@ -74,15 +74,15 @@ jobs:
   # debian:
   #   uses: ./.github/workflows/image-debian.yml
   #   secrets: inherit
-  devuan:
-    uses: ./.github/workflows/image-devuan.yml
-    secrets: inherit
+  # devuan:
+  #   uses: ./.github/workflows/image-devuan.yml
+  #   secrets: inherit
   # fedora:
   #   uses: ./.github/workflows/image-fedora.yml
   #   secrets: inherit
-  funtoo:
-    uses: ./.github/workflows/image-funtoo.yml
-    secrets: inherit
+  # funtoo:
+  #   uses: ./.github/workflows/image-funtoo.yml
+  #   secrets: inherit
   # gentoo:
   #   uses: ./.github/workflows/image-gentoo.yml
   #   secrets: inherit
@@ -116,9 +116,9 @@ jobs:
   # ubuntu:
   #   uses: ./.github/workflows/image-ubuntu.yml
   #   secrets: inherit
-  voidlinux:
-    uses: ./.github/workflows/image-voidlinux.yml
-    secrets: inherit
+  # voidlinux:
+  #   uses: ./.github/workflows/image-voidlinux.yml
+  #   secrets: inherit
   slackware:
     uses: ./.github/workflows/image-slackware.yml
     secrets: inherit
