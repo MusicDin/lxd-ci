@@ -137,11 +137,6 @@ if [ "${TYPE}" = "vm" ]; then
 
     INSTANCES="${TEST_IMAGE}"
 
-    # Handle distros needing the agent drive.
-    # if [ "${DIST}" = "almalinux" ] || [ "${DIST}" = "centos" ] || [ "${DIST}" = "openeuler" ] || [ "${DIST}" = "rockylinux" ]; then
-    #     lxc config device add "${TEST_IMAGE}" agent disk source=agent:config
-    # fi
-
     # Cloud-init testing.
     if [ "${VARIANT}" = "cloud" ]; then
         lxc config set "${TEST_IMAGE}" user.user-data "$(cat << EOF
@@ -214,7 +209,7 @@ done
 
 echo "==> Waiting for instances to start"
 for i in ${INSTANCES}; do
-    waitInstanceBooted "${i}"
+    waitInstanceReady "${i}"
 done
 
 # [ "${TYPE}" = "container" ] && sleep 1m
