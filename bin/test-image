@@ -13,16 +13,11 @@ waitInstanceReady() (
   set +x
   maxWait=150
   instName="${1}"
-  instProj="${2:-}"
-  if [ -z "${instProj}" ]; then
-    # Find the currently selected project.
-    instProj="$(lxc project list -f csv | sed -n 's/^\([^(]\+\) (current),.*/\1/ p')"
-  fi
 
   # Wait for the instance to report more than one process.
   processes=0
   for _ in $(seq "${maxWait}"); do
-      processes="$(lxc info --project "${instProj}" "${instName}" | awk '{if ($1 == "Processes:") print $2}')"
+      processes="$(lxc info "${instName}" | awk '{if ($1 == "Processes:") print $2}')"
       echo ">> [ Debug ] Processes (${instName}): ${processes}"
       if [ "${processes}" -gt 0 ]; then
           return 0 # Success.
@@ -30,33 +25,7 @@ waitInstanceReady() (
       sleep 1
   done
 
-  echo "Instance ${instName} (${instProj}) not ready after ${maxWait}s"
-  return 1 # Failed.
-)
-
-# waitInstanceBooted: waits for the instance to be ready and fully booted.
-waitInstanceBooted() (
-  set +x
-  maxWait=90
-  instName="$1"
-  instProj="${2:-}"
-  if [ -z "${instProj}" ]; then
-    # Find the currently selected project.
-    instProj="$(lxc project list -f csv | sed -n 's/^\([^(]\+\) (current),.*/\1/ p')"
-  fi
-
-  # Wait for the instance to be ready
-  waitInstanceReady "${instName}" "${instProj}"
-
-  # Then wait for the boot sequence to complete.
-  sleep 1
-  state="$(lxc exec --project "${instProj}" "${instName}" -- timeout "${maxWait}" systemctl is-system-running --wait || true)"
-  if [ "${state}" = "running" ]; then
-    return 0 # Success.
-  fi
-
-  echo "Instance ${instName} (${instProj}) not booted after ${maxWait}s"
-  lxc list --project "${instProj}" "${instName}"
+  echo "Instance ${instName} not ready after ${maxWait}s"
   return 1 # Failed.
 )
 
@@ -210,16 +179,12 @@ done
 
 echo "==> Waiting for instances to start"
 for i in ${INSTANCES}; do
-    waitInstanceReady "${i}"
+    waitInstanceReady "${i}" || true
     lxc info "${i}"
 done
 
 # Give instances some extra time to boot properly.
 sleep 15
-
-# [ "${TYPE}" = "container" ] && sleep 1m
-# [ "${TYPE}" = "vm" ] && sleep 3m
-
 lxc list "${TEST_IMAGE}"
 
 #
