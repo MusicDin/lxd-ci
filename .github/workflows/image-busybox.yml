@@ -43,10 +43,8 @@ jobs:
           TYPE="${{ env.type }}"
 
           ./bin/build-distro "${YAML}" "${ARCH}" "${TYPE}" "${TIMEOUT}" "${{ env.target }}" \
-              -o image.architecture="${IMAGE_ARCH}" \
+              -o image.architecture="${ARCH}" \
               -o image.release=${{ matrix.release }} \
-              -o image.variant=${{ matrix.variant }} \
-              ${EXTRA_ARGS}
 
       - name: Print build artifacts
         run: ls -lah "${{ env.target }}"
