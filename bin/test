@@ -1,0 +1,25 @@
+# waitInstanceReady: waits for the instance to be ready (processes count > 1).
+waitInstanceReady() (
+  set +x
+  maxWait=150
+  instName="${1}"
+
+  # Wait for the instance to report more than one process.
+  processes=0
+  for _ in $(seq "${maxWait}"); do
+      processes="$(lxc info "${instName}" | awk '{if ($1 == "Processes:") print $2}')"
+      if [ "${processes}" -gt 0 ]; then
+          return 0 # Success.
+      fi
+      sleep 1
+  done
+
+  echo "Instance ${instName} not ready after ${maxWait}s"
+  return 1 # Failed.
+)
+
+# Check input arguments.
+if [ "${1:-}" = "" ] || [ "${2:-}" = "" ] || [ "${3:-}" = "" ] || [ "${4:-}" = "" ] || [ "${5:-}" = "" ]; then
+    echo "Usage: ${0} <type> <distribution> <release> <variant> <target dir>"
+    exit 1
+fi
