@@ -60,7 +60,7 @@ runs:
         set -e
 
         SRC_DIR="${{ env.image_dir }}"
-        DST_DIR="${{ inputs.ssh_base_dir }}/images/${{ inputs.name }}"
+        DST_DIR="${{ inputs.ssh_base_dir }}/images/${{ inputs.image_name }}"
 
         SERIAL=$(cat "${SRC_DIR}/serial")
 
