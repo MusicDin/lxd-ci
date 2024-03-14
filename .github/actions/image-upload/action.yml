@@ -33,7 +33,7 @@ runs:
       # actions/upload-artifact does not expand env vars.
     - name: Expand target path
       shell: bash
-      run: echo "image_dir=${{ inputs.image_dir }}" >> $GITHUB_ENV
+      run: echo "image_dir=${{ inputs.image_dir }}/" >> $GITHUB_ENV
 
     - name: Print artifacts
       shell: bash
@@ -54,21 +54,31 @@ runs:
     #     compression-level: 0
     #     overwrite: true
 
-    - name: Configure known host
+    - name: Configure private key and known host
       shell: bash
+      env:
+        SSH_IP: ${{ inputs.ssh_ip }}
+        SSH_PK: ${{ inputs.ssh_private_key }}
+        SSH_PORT: ${{ inputs.ssh_port }}
       run : |
+        # Store image server private key.
         mkdir -p ~/.ssh
-        echo "${{ inputs.ssh_private_key }}" > ~/.ssh/imageserver_id_rsa
+        echo "${SSH_PK}" > ~/.ssh/imageserver_id_rsa
         chmod 600 ~/.ssh/imageserver_id_rsa
-        ssh-keyscan -H -p ${{ inputs.ssh_port }} ${{ inputs.ssh_ip }} >> ~/.ssh/known_hosts
+
+        # Configure known host.
+        ssh-keyscan -H -p ${SSH_PORT} ${SSH_IP} >> ~/.ssh/known_hosts
+
 
     - name: Rsync artifacts to the image server
       shell: bash
+      env:
+        SSH_IP: ${{ inputs.ssh_ip }}
+        SSH_USER: ${{ inputs.ssh_user }}
+        SSH_PORT: ${{ inputs.ssh_port }}
+        SRC_DIR: ${{ env.image_dir }}
+        DST_DIR: ${{ inputs.ssh_base_dir }}/images/${{ inputs.image_name }}
       run: |
-        set -e
-
-        SRC_DIR="${{ env.image_dir }}"
-        DST_DIR="${{ inputs.ssh_base_dir }}/images/${{ inputs.image_name }}"
         VERSION=$(cat "${SRC_DIR}/serial")
 
         rsync \
@@ -76,5 +86,5 @@ runs:
           --verbose \
           --compress \
           --mkpath \
-          --rsh "ssh -p ${{ inputs.ssh_port }} -i ~/.ssh/imageserver_id_rsa" \
-          "${SRC_DIR}" "${{ inputs.ssh_user }}@${{ inputs.ssh_ip }}:${DST_DIR}/${VERSION}"
+          --rsh "ssh -p ${SSH_PORT} -i ~/.ssh/imageserver_id_rsa" \
+          "${SRC_DIR}" "${SSH_USER}@${SSH_IP}:${DST_DIR}/${VERSION}"
