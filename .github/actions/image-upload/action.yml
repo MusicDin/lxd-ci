@@ -23,36 +23,13 @@ inputs:
   ssh_base_dir:
     description: SSH base destination directory on the image server
     required: true
-  # types:
-  #   description: Image types
-  #   required: true
 
 runs:
   using: composite
   steps:
-      # actions/upload-artifact does not expand env vars.
-    - name: Expand target path
-      shell: bash
-      run: echo "image_dir=${{ inputs.image_dir }}/" >> $GITHUB_ENV
-
     - name: Print artifacts
       shell: bash
-      run: ls -lah "${{ env.image_dir }}"
-
-    # - name: Publish artifacts
-    #   uses: actions/upload-artifact@v4
-    #   with:
-    #     name: "${{ inputs.image_name }}"
-    #     path: |
-    #       ${{ env.target }}/*.qcow2
-    #       ${{ env.target }}/*.squashfs
-    #       ${{ env.target }}/*.tar.xz
-    #       ${{ env.target }}/image.yaml
-    #       ${{ env.target }}/serial
-    #     if-no-files-found: "error"
-    #     retention-days: 1
-    #     compression-level: 0
-    #     overwrite: true
+      run: ls -lah "${{ inputs.image_dir }}"
 
     - name: Configure private key and known host
       shell: bash
@@ -76,7 +53,7 @@ runs:
         SSH_IP: ${{ inputs.ssh_ip }}
         SSH_USER: ${{ inputs.ssh_user }}
         SSH_PORT: ${{ inputs.ssh_port }}
-        SRC_DIR: ${{ env.image_dir }}
+        SRC_DIR: ${{ inputs.image_dir }}
         DST_DIR: ${{ inputs.ssh_base_dir }}/images/${{ inputs.image_name }}
       run: |
         VERSION=$(cat "${SRC_DIR}/serial")
@@ -87,4 +64,4 @@ runs:
           --compress \
           --mkpath \
           --rsh "ssh -p ${SSH_PORT} -i ~/.ssh/imageserver_id_rsa" \
-          "${SRC_DIR}" "${SSH_USER}@${SSH_IP}:${DST_DIR}/${VERSION}"
+          "${SRC_DIR}/" "${SSH_USER}@${SSH_IP}:${DST_DIR}/${VERSION}"
