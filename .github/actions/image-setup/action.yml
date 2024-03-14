@@ -18,7 +18,7 @@ runs:
     - name: Checkout LXD imagebuilder
       uses: actions/checkout@v4
       with:
-        repository: canonical/lxd-imagebuilder
+        repository: musicdin/lxd-imagebuilder
         path: lxd-imagebuilder
         ssh-key: ${{ inputs.ssh-key }}
 
