@@ -45,18 +45,15 @@ runs:
         # Configure known host.
         ssh-keyscan -H -p ${SSH_PORT} ${SSH_IP} >> ~/.ssh/known_hosts
 
-
     - name: Rsync artifacts to the image server
       shell: bash
       env:
         SSH_IP: ${{ inputs.ssh_ip }}
         SSH_USER: ${{ inputs.ssh_user }}
         SSH_PORT: ${{ inputs.ssh_port }}
-        SRC_DIR: ${{ inputs.image_dir }}
-        DST_DIR: ${{ inputs.ssh_base_dir }}/images/${{ inputs.image_name }}
       run: |
-        # Expand SRC_DIR.
-        SRC_DIR=$(echo "${SRC_DIR}")
+        DST_DIR=${{ inputs.ssh_base_dir }}/images/${{ inputs.image_name }}
+        SRC_DIR=$(echo ${{ inputs.image_dir }})
         VERSION=$(cat "${SRC_DIR}/serial")
 
         echo "${SRC_DIR}"
