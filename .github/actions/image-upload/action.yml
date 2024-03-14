@@ -72,8 +72,9 @@ runs:
         VERSION=$(cat "${SRC_DIR}/serial")
 
         rsync \
-          -avz \
-          -e "ssh -p ${{ inputs.ssh_port }} -i ~/.ssh/imageserver_id_rsa" \
-          --rsync-path="mkdir -p ${DST_DIR}/${VERSION} && rsync"
-          "${SRC_DIR}" \
-          "${{ inputs.ssh_user }}@${{ inputs.ssh_ip }}:${DST_DIR}/${VERSION}"
+          --archive \
+          --verbose \
+          --compress \
+          --mkpath \
+          --rsh "ssh -p ${{ inputs.ssh_port }} -i ~/.ssh/imageserver_id_rsa" \
+          "${SRC_DIR}" "${{ inputs.ssh_user }}@${{ inputs.ssh_ip }}:${DST_DIR}/${VERSION}"
