@@ -109,7 +109,7 @@ jobs:
           ssh_private_key: "${{ secrets.IMAGESERVER_SSH_PK }}"
           ssh_base_dir: "${{ secrets.IMAGESERVER_SSH_BASE_DIR }}"
 
-      - name: Tmate debugging session
-        if: failure()
-        uses: mxschmitt/action-tmate@v3
-        timeout-minutes: 30
+      # - name: Tmate debugging session
+      #   if: failure()
+      #   uses: mxschmitt/action-tmate@v3
+      #   timeout-minutes: 30
