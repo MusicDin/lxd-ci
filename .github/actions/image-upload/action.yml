@@ -56,7 +56,13 @@ runs:
         SRC_DIR: ${{ inputs.image_dir }}
         DST_DIR: ${{ inputs.ssh_base_dir }}/images/${{ inputs.image_name }}
       run: |
+        # Expand SRC_DIR and add trailing slash to rsync its content without
+        # parent directory.
+        SRC_DIR=$(echo "${SRC_DIR}/")
         VERSION=$(cat "${SRC_DIR}/serial")
+
+        echo "${SRC_DIR}"
+        echo "${VERSION}"
 
         rsync \
           --archive \
@@ -64,4 +70,4 @@ runs:
           --compress \
           --mkpath \
           --rsh "ssh -p ${SSH_PORT} -i ~/.ssh/imageserver_id_rsa" \
-          "${SRC_DIR}/" "${SSH_USER}@${SSH_IP}:${DST_DIR}/${VERSION}"
+          "${SRC_DIR}" "${SSH_USER}@${SSH_IP}:${DST_DIR}/${VERSION}"
