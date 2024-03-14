@@ -35,12 +35,11 @@ runs:
       shell: bash
       env:
         SSH_IP: ${{ inputs.ssh_ip }}
-        SSH_PK: ${{ inputs.ssh_private_key }}
         SSH_PORT: ${{ inputs.ssh_port }}
       run : |
         # Store image server private key.
         mkdir -p ~/.ssh
-        echo "${SSH_PK}" > ~/.ssh/imageserver_id_rsa
+        echo "${{ inputs.ssh_private_key }}" > ~/.ssh/imageserver_id_rsa
         chmod 600 ~/.ssh/imageserver_id_rsa
 
         # Configure known host.
