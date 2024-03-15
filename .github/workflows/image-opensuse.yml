@@ -5,7 +5,7 @@ on:
     inputs:
       publish:
         type: boolean
-        default: false
+        default: true
         description: Publish built image
   workflow_call:
     inputs:
@@ -100,6 +100,10 @@ jobs:
         uses: ./.github/actions/image-upload
         if: inputs.publish == true
         with:
-          target: ${{ env.target }}
-          image_dir: "${{ env.distro }}/${{ matrix.release }}/${{ matrix.architecture }}/${{ matrix.variant }}"
-          ssh_private_key: "${{ secrets.LXD_INFRA_IMAGES_KEY }}"
+          image_name: "${{ env.distro }}/${{ matrix.release }}/${{ matrix.architecture }}/${{ matrix.variant }}"
+          image_dir: "${{ env.target }}"
+          ssh_ip: "${{ secrets.IMAGESERVER_SSH_IP }}"
+          ssh_port: "${{ secrets.IMAGESERVER_SSH_PORT }}"
+          ssh_user: "${{ secrets.IMAGESERVER_SSH_USER }}"
+          ssh_private_key: "${{ secrets.IMAGESERVER_SSH_PK }}"
+          ssh_base_dir: "${{ secrets.IMAGESERVER_SSH_BASE_DIR }}"
