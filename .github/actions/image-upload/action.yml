@@ -52,26 +52,27 @@ runs:
         SSH_USER: ${{ inputs.ssh_user }}
         SSH_PORT: ${{ inputs.ssh_port }}
       run: |
+        # DST_DIR=${{ inputs.ssh_base_dir }}/images/${{ inputs.image_name }}
+        # SRC_DIR=$(echo ${{ inputs.image_dir }})
+
         DST_DIR=${{ inputs.image_name }}
         IMG_DIR=$(echo ${{ inputs.image_dir }})
         VERSION=$(cat "${IMG_DIR}/serial")
-
-        # DST_DIR=${{ inputs.ssh_base_dir }}/images/${{ inputs.image_name }}
 
         # Replicate destination directory structure.
         SRC_DIR="${HOME}/upload"
         mkdir -p "${SRC_DIR}/${DST_DIR}/${VERSION}"
 
-        echo "==> IMG_DIR: ${IMG_DIR}"
-        ls ${IMG_DIR}
-
-        echo "==> DST_DIR: ${SRC_DIR}/${DST_DIR}/${VERSION}/"
-        ls ${SRC_DIR}/${DST_DIR}/${VERSION}/
-
         mv ${IMG_DIR}/* "${SRC_DIR}/${DST_DIR}/${VERSION}/"
 
-        echo "==> SRC_DIR: ${SRC_DIR}"
-        echo "==> VERSION: ${VERSION}"
+        # s -> Uses SFTP protocol
+        # r -> Copies files recursively
+        # p -> Preserves modification and access times
+        # C -> Enables compression
+        #
+        scp -srpC -P ${SSH_PORT} -i ~/.ssh/imageserver_id_rsa \
+          ${SRC_DIR}/* \
+          "${SSH_USER}@${SSH_IP}:."
 
         # rsync \
         #   --archive \
@@ -80,13 +81,3 @@ runs:
         #   --mkpath \
         #   --rsh "ssh -p ${SSH_PORT} -i ~/.ssh/imageserver_id_rsa" \
         #   "${SRC_DIR}/" "${SSH_USER}@${SSH_IP}:${DST_DIR}/${VERSION}"
-
-        # s -> Uses SFTP server
-        # r -> Copies files recursively
-        # p -> Preserves modification and access times
-        # C -> Enables compression
-        #
-        scp -srpC -P ${SSH_PORT} -i ~/.ssh/imageserver_id_rsa \
-          "${SRC_DIR}/*" \
-          "${SSH_USER}@${SSH_IP}:."
-
