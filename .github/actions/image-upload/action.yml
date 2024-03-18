@@ -53,17 +53,15 @@ runs:
         SSH_PORT: ${{ inputs.ssh_port }}
       run: |
         # DST_DIR=${{ inputs.ssh_base_dir }}/images/${{ inputs.image_name }}
-        # SRC_DIR=$(echo ${{ inputs.image_dir }})
 
         DST_DIR=${{ inputs.image_name }}
-        IMG_DIR=$(echo ${{ inputs.image_dir }})
-        VERSION=$(cat "${IMG_DIR}/serial")
+        SRC_DIR=$(echo ${{ inputs.image_dir }})
+        VERSION=$(cat "${SRC_DIR}/serial")
 
         # Replicate destination directory structure.
-        SRC_DIR="${HOME}/upload"
-        mkdir -p "${SRC_DIR}/${DST_DIR}/${VERSION}"
-
-        mv ${IMG_DIR}/* "${SRC_DIR}/${DST_DIR}/${VERSION}/"
+        mkdir -p "${SRC_DIR}-tmp/${DST_DIR}/${VERSION}"
+        mv ${SRC_DIR}/* "${SRC_DIR}-tmp/${DST_DIR}/${VERSION}/"
+        mv "${SRC_DIR}-tmp" "${SRC_DIR}"
 
         # s -> Uses SFTP protocol
         # r -> Copies files recursively
