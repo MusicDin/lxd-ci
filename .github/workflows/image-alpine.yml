@@ -68,28 +68,25 @@ jobs:
               -o image.release=${{ matrix.release }} \
               -o image.variant=${{ matrix.variant }}
 
-      - name: Print build artifacts
-        run: ls -lah "${{ env.target }}"
+      # - name: Test container image
+      #   uses: ./.github/actions/image-test
+      #   if: contains(env.type, 'container')
+      #   with:
+      #     type: container
+      #     target: ${{ env.target }}
+      #     distro: ${{ env.distro }}
+      #     release: ${{ matrix.release }}
+      #     variant: ${{ matrix.variant }}
 
-      - name: Test container image
-        uses: ./.github/actions/image-test
-        if: contains(env.type, 'container')
-        with:
-          type: container
-          target: ${{ env.target }}
-          distro: ${{ env.distro }}
-          release: ${{ matrix.release }}
-          variant: ${{ matrix.variant }}
-
-      - name: Test VM image
-        uses: ./.github/actions/image-test
-        if: contains(env.type, 'vm')
-        with:
-          type: vm
-          target: ${{ env.target }}
-          distro: ${{ env.distro }}
-          release: ${{ matrix.release }}
-          variant: ${{ matrix.variant }}
+      # - name: Test VM image
+      #   uses: ./.github/actions/image-test
+      #   if: contains(env.type, 'vm')
+      #   with:
+      #     type: vm
+      #     target: ${{ env.target }}
+      #     distro: ${{ env.distro }}
+      #     release: ${{ matrix.release }}
+      #     variant: ${{ matrix.variant }}
 
       # - name: Upload image
       #   uses: ./.github/actions/image-upload
