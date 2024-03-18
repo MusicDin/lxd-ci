@@ -59,9 +59,8 @@ runs:
         VERSION=$(cat "${SRC_DIR}/serial")
 
         # Replicate destination directory structure.
-        mkdir -p "${SRC_DIR}-tmp/${DST_DIR}/${VERSION}"
-        mv ${SRC_DIR}/* "${SRC_DIR}-tmp/${DST_DIR}/${VERSION}/"
-        mv "${SRC_DIR}-tmp" "${SRC_DIR}"
+        mkdir -p "${SRC_DIR}-upload/${DST_DIR}/${VERSION}"
+        mv ${SRC_DIR}/* "${SRC_DIR}-upload/${DST_DIR}/${VERSION}/"
 
         # s -> Uses SFTP protocol
         # r -> Copies files recursively
@@ -69,7 +68,7 @@ runs:
         # C -> Enables compression
         #
         scp -srpC -P ${SSH_PORT} -i ~/.ssh/imageserver_id_rsa \
-          ${SRC_DIR}/* \
+          ${SRC_DIR}-upload/* \
           "${SSH_USER}@${SSH_IP}:."
 
         # rsync \
