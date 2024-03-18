@@ -87,6 +87,6 @@ runs:
         # C -> Enables compression
         #
         scp -srpC -P ${SSH_PORT} -i ~/.ssh/imageserver_id_rsa \
-          "${SRC_DIR}/" \
+          "${SRC_DIR}/*" \
           "${SSH_USER}@${SSH_IP}:."
 
