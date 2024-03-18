@@ -71,7 +71,7 @@ runs:
 
         echo "===> SSH"
 
-        ssh -p -v ${SSH_PORT} -i ~/.ssh/imageserver_id_rsa \
+        ssh -v -p ${SSH_PORT} -i ~/.ssh/imageserver_id_rsa \
           ${SSH_USER}@${SSH_IP} \
           "mkdir -p ${DST_DIR}/${VERSION}" || true
 
