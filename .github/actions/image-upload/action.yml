@@ -61,7 +61,14 @@ runs:
         # Replicate destination directory structure.
         SRC_DIR="${HOME}/upload"
         mkdir -p "${SRC_DIR}/${DST_DIR}/${VERSION}"
-        mv "${IMG_DIR}/*" "${SRC_DIR}/${DST_DIR}/${VERSION}/"
+
+        echo "==> IMG_DIR: ${IMG_DIR}"
+        ls ${IMG_DIR}
+
+        echo "==> DST_DIR: ${SRC_DIR}/${DST_DIR}/${VERSION}/"
+        ls ${SRC_DIR}/${DST_DIR}/${VERSION}/
+
+        mv ${IMG_DIR}/* "${SRC_DIR}/${DST_DIR}/${VERSION}/"
 
         echo "==> SRC_DIR: ${SRC_DIR}"
         echo "==> VERSION: ${VERSION}"
