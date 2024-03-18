@@ -52,9 +52,11 @@ runs:
         SSH_USER: ${{ inputs.ssh_user }}
         SSH_PORT: ${{ inputs.ssh_port }}
       run: |
-        DST_DIR=${{ inputs.ssh_base_dir }}/images/${{ inputs.image_name }}
+        DST_DIR=images/${{ inputs.image_name }}
         SRC_DIR=$(echo ${{ inputs.image_dir }})
         VERSION=$(cat "${SRC_DIR}/serial")
+
+        # DST_DIR=${{ inputs.ssh_base_dir }}/images/${{ inputs.image_name }}
 
         echo "${SRC_DIR}"
         echo "${VERSION}"
@@ -66,6 +68,10 @@ runs:
         #   --mkpath \
         #   --rsh "ssh -p ${SSH_PORT} -i ~/.ssh/imageserver_id_rsa" \
         #   "${SRC_DIR}/" "${SSH_USER}@${SSH_IP}:${DST_DIR}/${VERSION}"
+
+        ssh -p ${SSH_PORT} -i ~/.ssh/imageserver_id_rsa \
+          ${SSH_USER}@${SSH_IP} \
+          "mkdir -p ${DST_DIR}/${VERSION}"
 
         # s -> Uses SFTP server
         # r -> Copies files recursively
