@@ -51,13 +51,12 @@ runs:
       run: |
         # Ensure path of the source directory is expanded.
         SRC_DIR=$(echo ${{ inputs.target }})
-        IMG_DIR=${{ inputs.image_path }}
+        IMG_DIR=${{ inputs.image_dir }}
         VERSION=$(cat "${SRC_DIR}/serial")
 
         # Create directory structure that will be mirrored on the target server.
         PRODUCT_PATH="${SRC_DIR}-upload/${IMG_DIR}"
-        VERSION_PATH="${PRODUCT_PATH}/${VERSION}"
-        mkdir -p "${VERSION_PATH}"
+        mkdir -p "${VERSION_PATH}/${VERSION}"
 
         # Move config.yml file if exists.
         if [ -f "${SRC_DIR}/config.yml" ]; then
@@ -65,7 +64,7 @@ runs:
         fi
 
         # Move image content.
-        mv ${SRC_DIR}/* "${PRODUCT_PATH}/"
+        mv ${SRC_DIR}/* "${PRODUCT_PATH}/${VERSION}"
 
         # s -> Uses SFTP protocol
         # r -> Copies files recursively
