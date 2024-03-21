@@ -24,7 +24,7 @@ runs:
     - name: Generate config.yml
       shell: bash
       run: |
-        CONFIG: "${{ inputs.target }}/config.yml"
+        CONFIG="${{ inputs.target }}/config.yml"
         RELEASE=${{ inputs.release }}
         RELEASE_ALIASES="${{ inputs.image_release_aliases }}"
         DISTRO_TITLE="${{ inputs.image_title }}"
