@@ -18,8 +18,7 @@ runs:
     - name: Generate config
       shell: bash
       run: |
-        config=config.yml
-
+        config="${{ inputs.target }}/config.yml"
         distro_title="${{ inputs.image_title }}"
         requirements="${{ inputs.image_requirements }}"
 

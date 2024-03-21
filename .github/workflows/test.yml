@@ -4,12 +4,15 @@ on:
   push:
 
 jobs:
-  voidlinux:
+  image-config:
     runs-on: ubuntu-latest
     env:
       type: "container"
       distro: "${{ github.job }}"
       target: "${HOME}/build"
+      release_aliases: |
+        12=bookworm
+        13=trixie
 
     steps:
       - uses: actions/checkout@v4
@@ -17,7 +20,8 @@ jobs:
       - name: Test container image
         uses: ./.github/actions/image-config
         with:
-          images_requirements: |-
+          target: "${{ env.target }}"
+          image_requirements: |-
             secure_boot=false
             custom_key = true
 
