@@ -33,9 +33,9 @@ jobs:
   # centos:
   #   uses: ./.github/workflows/image-centos.yml
   #   secrets: inherit
-  debian:
-    uses: ./.github/workflows/image-debian.yml
-    secrets: inherit
+  # debian:
+  #   uses: ./.github/workflows/image-debian.yml
+  #   secrets: inherit
   # devuan:
   #   uses: ./.github/workflows/image-devuan.yml
   #   secrets: inherit
