@@ -23,22 +23,25 @@ runs:
   steps:
     - name: Generate config.yml
       shell: bash
+      env:
+        CONFIG: "${{ inputs.target }}/config.yml"
+        RELEASE: "${{ inputs.release }}"
+        RELEASE_ALIASES: "${{ inputs.image_release_aliases }}"
+        DISTRO_TITLE: "${{ inputs.image_title }}"
+        REQUIREMENTS: "${{ inputs.image_requirements }}"
       run: |
-        CONFIG="${{ inputs.target }}/config.yml"
-        RELEASE=${{ inputs.release }}
-        RELEASE_ALIASES="${{ inputs.image_release_aliases }}"
-        DISTRO_TITLE="${{ inputs.image_title }}"
-        REQUIREMENTS="${{ inputs.image_requirements }}"
+        # CONFIG: "${{ inputs.target }}/config.yml"
+        # RELEASE=${{ inputs.release }}
+        # RELEASE_ALIASES="${{ inputs.image_release_aliases }}"
+        # DISTRO_TITLE="${{ inputs.image_title }}"
+        # REQUIREMENTS="${{ inputs.image_requirements }}"
 
-        # Ensure directory config's exists.
         mkdir -p "${{ inputs.target }}"
 
-        # Image title.
         if [ -n "${DISTRO_TITLE}" ]; then
             echo "distro_title: '${DISTRO_TITLE}'" >> "${CONFIG}"
         fi
 
-        # Add release aliases.
         while IFS='=' read -r key alias; do
             key=$(echo "${key}" | tr -d ' ')
             alias=$(echo "${alias}" | tr -d ' ')
@@ -49,7 +52,6 @@ runs:
             fi
         done <<< "${RELEASE_ALIASES}"
 
-        # Build requirements.
         if [ -n "${REQUIREMENTS}" ]; then
             echo "requirements:" >> "${CONFIG}"
 
