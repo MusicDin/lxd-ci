@@ -56,7 +56,7 @@ runs:
 
         # Create directory structure that will be mirrored on the target server.
         PRODUCT_PATH="${SRC_DIR}-upload/${IMG_DIR}"
-        mkdir -p "${VERSION_PATH}/${VERSION}"
+        mkdir -p "${PRODUCT_PATH}/${VERSION}"
 
         # Move config.yml file if exists.
         if [ -f "${SRC_DIR}/config.yml" ]; then
