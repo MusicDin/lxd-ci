@@ -1,0 +1,23 @@
+name: Test config
+
+on:
+  push:
+
+jobs:
+  voidlinux:
+    runs-on: ubuntu-latest
+    env:
+      type: "container"
+      distro: "${{ github.job }}"
+      target: "${HOME}/build"
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Test container image
+        uses: ./.github/actions/image-config
+        with:
+          images_requirements: |-
+            secure_boot=false
+            custom_key = true
+

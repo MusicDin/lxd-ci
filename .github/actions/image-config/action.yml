@@ -1,0 +1,45 @@
+name: Upload Image
+description: Composite action for uploading built images
+
+inputs:
+  target:
+    description: Directory where config.yaml is generated
+    required: true
+  image_title:
+    description: Image title
+    default: ""
+  image_requirements:
+    description: Image requirements
+    default: ""
+
+runs:
+  using: composite
+  steps:
+    - name: Generate config
+      shell: bash
+      run: |
+        config=config.yml
+
+        distro_title="${{ inputs.image_title }}"
+        requirements="${{ inputs.image_requirements }}"
+
+        # Image title.
+        if [ -n "${distro_title}" ]; then
+            echo "distro_title: '${distro_title}'" >> "${config}"
+        fi
+
+        # Build requirements.
+        if [ -n "${requirements}" ]; then
+            echo "requirements:" >> "${config}"
+
+            while IFS='=' read -r key val; do
+                key=$(echo "${key}" | tr -d ' ')
+                val=$(echo "${val}" | tr -d ' ')
+
+                if [ -n "${key}" ] && [ -n "${val}" ]; then
+                    echo "  ${key}: ${val}" >> "${config}"
+                fi
+            done <<< "${requirements}"
+        fi
+
+        cat config.yml
