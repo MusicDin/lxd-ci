@@ -18,9 +18,13 @@ runs:
     - name: Generate config
       shell: bash
       run: |
+        echo "Req: ${{ inputs.image_requirements }}"
+
         config="${{ inputs.target }}/config.yml"
-        distro_title="${{ inputs.image_title }}"
+        distro_title=test # "${{ inputs.image_title }}"
         requirements="${{ inputs.image_requirements }}"
+
+
 
         # Ensure directory exists:
         mkdir -p "${{ inputs.target }}"
