@@ -48,4 +48,4 @@ runs:
             done <<< "${requirements}"
         fi
 
-        cat config.yml
+        cat "${config}"
