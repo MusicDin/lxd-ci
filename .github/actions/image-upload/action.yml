@@ -2,11 +2,11 @@ name: Upload Image
 description: Composite action for uploading built images
 
 inputs:
-  # image_name:
-  #   description: Final image name
-  #   required: true
-  image_dir:
+  target:
     description: Directory where built image is located
+    required: true
+  image_dir:
+    description: Image directory in format <distro>/<release>/<arch>/<variant>
     required: true
   ssh_ip:
     description: SSH IP of the image server
@@ -26,7 +26,7 @@ runs:
   steps:
     - name: Print artifacts
       shell: bash
-      run: ls -lah "${{ inputs.image_dir }}"
+      run: ls -lah "${{ inputs.target }}"
 
     - name: Configure private key and known host
       shell: bash
@@ -50,14 +50,22 @@ runs:
         SSH_PORT: ${{ inputs.ssh_port }}
       run: |
         # Ensure path of the source directory is expanded.
-        SRC_DIR=$(echo ${{ inputs.image_dir }})
+        SRC_DIR=$(echo ${{ inputs.target }})
+        IMG_DIR=${{ inputs.image_path }}
+        VERSION=$(cat "${SRC_DIR}/serial")
 
-        # DST_DIR=${{ inputs.image_name }}
-        # VERSION=$(cat "${SRC_DIR}/serial")
+        # Create directory structure that will be mirrored on the target server.
+        PRODUCT_PATH="${SRC_DIR}-upload/${IMG_DIR}"
+        VERSION_PATH="${PRODUCT_PATH}/${VERSION}"
+        mkdir -p "${VERSION_PATH}"
 
-        # Replicate destination directory structure.
-        # mkdir -p "${SRC_DIR}-upload/${DST_DIR}/${VERSION}"
-        # mv ${SRC_DIR}/* "${SRC_DIR}-upload/${DST_DIR}/${VERSION}/"
+        # Move config.yml file if exists.
+        if [ -f "${SRC_DIR}/config.yml" ]; then
+            mv "${SRC_DIR}/config.yml" "${PRODUCT_PATH}"
+        fi
+
+        # Move image content.
+        mv ${SRC_DIR}/* "${PRODUCT_PATH}/"
 
         # s -> Uses SFTP protocol
         # r -> Copies files recursively
@@ -65,13 +73,6 @@ runs:
         # C -> Enables compression
         #
         scp -srpC -v -P ${SSH_PORT} -i ~/.ssh/imageserver_id_rsa \
-          ${SRC_DIR}/* \
+          ${SRC_DIR}-upload/* \
           "${SSH_USER}@${SSH_IP}:."
 
-        # rsync \
-        #   --archive \
-        #   --verbose \
-        #   --compress \
-        #   --mkpath \
-        #   --rsh "ssh -p ${SSH_PORT} -i ~/.ssh/imageserver_id_rsa" \
-        #   "${SRC_DIR}/" "${SSH_USER}@${SSH_IP}:${DST_DIR}/${VERSION}"
