@@ -21,14 +21,14 @@ jobs:
       fail-fast: false
       matrix:
         release:
-          # - "3.16"
-          # - "3.17"
-          # - "3.18"
+          - "3.16"
+          - "3.17"
+          - "3.18"
           - "3.19"
           - "edge"
         variant:
           - default
-          # - cloud
+          - cloud
         architecture:
           - amd64
           # - arm64
@@ -68,25 +68,25 @@ jobs:
               -o image.release=${{ matrix.release }} \
               -o image.variant=${{ matrix.variant }}
 
-      # - name: Test container image
-      #   uses: ./.github/actions/image-test
-      #   if: contains(env.type, 'container')
-      #   with:
-      #     type: container
-      #     target: ${{ env.target }}
-      #     distro: ${{ env.distro }}
-      #     release: ${{ matrix.release }}
-      #     variant: ${{ matrix.variant }}
+      - name: Test container image
+        uses: ./.github/actions/image-test
+        if: contains(env.type, 'container')
+        with:
+          type: container
+          target: ${{ env.target }}
+          distro: ${{ env.distro }}
+          release: ${{ matrix.release }}
+          variant: ${{ matrix.variant }}
 
-      # - name: Test VM image
-      #   uses: ./.github/actions/image-test
-      #   if: contains(env.type, 'vm')
-      #   with:
-      #     type: vm
-      #     target: ${{ env.target }}
-      #     distro: ${{ env.distro }}
-      #     release: ${{ matrix.release }}
-      #     variant: ${{ matrix.variant }}
+      - name: Test VM image
+        uses: ./.github/actions/image-test
+        if: contains(env.type, 'vm')
+        with:
+          type: vm
+          target: ${{ env.target }}
+          distro: ${{ env.distro }}
+          release: ${{ matrix.release }}
+          variant: ${{ matrix.variant }}
 
       # - name: Upload image
       #   uses: ./.github/actions/image-upload
