@@ -1,7 +1,7 @@
 name: Test config
 
 on:
-  workflow_dispatch:
+  push:
 
 jobs:
   image-config:
@@ -17,10 +17,15 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Test container image
+      - name: Test image config
         uses: ./.github/actions/image-config
         with:
           target: "${{ env.target }}"
+          release: bookworm
+          image_release_aliases: |-
+            bullseye = 11
+            bookworm = 12
+            trixie   = 13
           image_requirements: |-
             secure_boot=false
             custom_key = true

@@ -5,6 +5,12 @@ inputs:
   target:
     description: Directory where config.yaml is generated
     required: true
+  release:
+    description: Image release
+    required: true
+  image_release_mapper:
+    description: Mapping of the release and its aliases
+    default: ""
   image_title:
     description: Image title
     default: ""
@@ -15,27 +21,36 @@ inputs:
 runs:
   using: composite
   steps:
-    - name: Generate config
+    - name: Generate config.yml
       shell: bash
       run: |
-        echo "Req: ${{ inputs.image_requirements }}"
+        CONFIG="${{ inputs.target }}/config.yml"
+        RELEASE=${{ inputs.release }}
+        RELEASE_MAPPER="${{ inputs.image_release_mapper }}"
+        DISTRO_TITLE="${{ inputs.image_title }}"
+        REQUIREMENTS="${{ inputs.image_requirements }}"
 
-        config="${{ inputs.target }}/config.yml"
-        distro_title=test # "${{ inputs.image_title }}"
-        requirements="${{ inputs.image_requirements }}"
-
-
-
-        # Ensure directory exists:
+        # Ensure directory config's exists.
         mkdir -p "${{ inputs.target }}"
 
         # Image title.
-        if [ -n "${distro_title}" ]; then
-            echo "distro_title: '${distro_title}'" >> "${config}"
+        if [ -n "${DISTRO_TITLE}" ]; then
+            echo "distro_title: '${DISTRO_TITLE}'" >> "${config}"
         fi
 
+        # Add release aliases.
+        while IFS='=' read -r key alias; do
+            key=$(echo "${key}" | tr -d ' ')
+            alias=$(echo "${alias}" | tr -d ' ')
+
+            if [ "${key}" == "${RELEASE}" ] || [ -n "${alias}" ]; then
+                echo "release_alias: ${alias}" >> config.yml
+                break
+            fi
+        done <<< "${RELEASE_MAPPER}"
+
         # Build requirements.
-        if [ -n "${requirements}" ]; then
+        if [ -n "${REQUIREMENTS}" ]; then
             echo "requirements:" >> "${config}"
 
             while IFS='=' read -r key val; do
@@ -45,7 +60,7 @@ runs:
                 if [ -n "${key}" ] && [ -n "${val}" ]; then
                     echo "  ${key}: ${val}" >> "${config}"
                 fi
-            done <<< "${requirements}"
+            done <<< "${REQUIREMENTS}"
         fi
 
         cat "${config}"
