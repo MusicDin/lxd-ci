@@ -35,7 +35,7 @@ runs:
 
         # Image title.
         if [ -n "${DISTRO_TITLE}" ]; then
-            echo "distro_title: '${DISTRO_TITLE}'" >> "${config}"
+            echo "distro_title: '${DISTRO_TITLE}'" >> "${CONFIG}"
         fi
 
         # Add release aliases.
@@ -44,23 +44,23 @@ runs:
             alias=$(echo "${alias}" | tr -d ' ')
 
             if [ "${key}" == "${RELEASE}" ] || [ -n "${alias}" ]; then
-                echo "release_alias: ${alias}" >> config.yml
+                echo "release_alias: ${alias}" >> "${CONFIG}"
                 break
             fi
         done <<< "${RELEASE_ALIASES}"
 
         # Build requirements.
         if [ -n "${REQUIREMENTS}" ]; then
-            echo "requirements:" >> "${config}"
+            echo "requirements:" >> "${CONFIG}"
 
             while IFS='=' read -r key val; do
                 key=$(echo "${key}" | tr -d ' ')
                 val=$(echo "${val}" | tr -d ' ')
 
                 if [ -n "${key}" ] && [ -n "${val}" ]; then
-                    echo "  ${key}: ${val}" >> "${config}"
+                    echo "  ${key}: ${val}" >> "${CONFIG}"
                 fi
             done <<< "${REQUIREMENTS}"
         fi
 
-        cat "${config}"
+        cat "${CONFIG}"
