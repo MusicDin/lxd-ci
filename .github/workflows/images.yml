@@ -33,15 +33,15 @@ jobs:
   # centos:
   #   uses: ./.github/workflows/image-centos.yml
   #   secrets: inherit
-  # debian:
-  #   uses: ./.github/workflows/image-debian.yml
-  #   secrets: inherit
+  debian:
+    uses: ./.github/workflows/image-debian.yml
+    secrets: inherit
   # devuan:
   #   uses: ./.github/workflows/image-devuan.yml
   #   secrets: inherit
-  # fedora:
-  #   uses: ./.github/workflows/image-fedora.yml
-  #   secrets: inherit
+  fedora:
+    uses: ./.github/workflows/image-fedora.yml
+    secrets: inherit
   # funtoo:
   #   uses: ./.github/workflows/image-funtoo.yml
   #   secrets: inherit
@@ -57,9 +57,9 @@ jobs:
   # openeuler:
   #   uses: ./.github/workflows/image-openeuler.yml
   #   secrets: inherit
-  # opensuse:
-  #   uses: ./.github/workflows/image-opensuse.yml
-  #   secrets: inherit
+  opensuse:
+    uses: ./.github/workflows/image-opensuse.yml
+    secrets: inherit
   # openwrt:
   #   uses: ./.github/workflows/image-openwrt.yml
   #   secrets: inherit

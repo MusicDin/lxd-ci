@@ -92,8 +92,8 @@ jobs:
         uses: ./.github/actions/image-upload
         if: inputs.publish == true
         with:
-          image_name: "${{ env.distro }}/${{ matrix.release }}/${{ matrix.architecture }}/${{ matrix.variant }}"
-          image_dir: "${{ env.target }}"
+          target: ${{ env.target }}
+          image_dir: "${{ env.distro }}/${{ matrix.release }}/${{ matrix.architecture }}/${{ matrix.variant }}"
           ssh_ip: "${{ secrets.IMAGESERVER_SSH_IP }}"
           ssh_port: "${{ secrets.IMAGESERVER_SSH_PORT }}"
           ssh_user: "${{ secrets.IMAGESERVER_SSH_USER }}"
