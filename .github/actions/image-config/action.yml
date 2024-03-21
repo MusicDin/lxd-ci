@@ -22,6 +22,9 @@ runs:
         distro_title="${{ inputs.image_title }}"
         requirements="${{ inputs.image_requirements }}"
 
+        # Ensure directory exists:
+        mkdir -p "${{ inputs.target }}"
+
         # Image title.
         if [ -n "${distro_title}" ]; then
             echo "distro_title: '${distro_title}'" >> "${config}"
