@@ -67,7 +67,7 @@ runs:
         # p -> Preserves modification and access times
         # C -> Enables compression
         #
-        scp -srpC -P ${SSH_PORT} -i ~/.ssh/imageserver_id_rsa \
+        scp -srpC -v -P ${SSH_PORT} -i ~/.ssh/imageserver_id_rsa \
           ${SRC_DIR}-upload/* \
           "${SSH_USER}@${SSH_IP}:."
 
