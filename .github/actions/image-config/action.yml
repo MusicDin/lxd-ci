@@ -23,18 +23,12 @@ runs:
   steps:
     - name: Generate config.yml
       shell: bash
-      env:
-        CONFIG: "${{ inputs.target }}/config.yml"
-        RELEASE: "${{ inputs.release }}"
-        RELEASE_ALIASES: "${{ inputs.image_release_aliases }}"
-        DISTRO_TITLE: "${{ inputs.image_title }}"
-        REQUIREMENTS: "${{ inputs.image_requirements }}"
       run: |
-        # CONFIG: "${{ inputs.target }}/config.yml"
-        # RELEASE=${{ inputs.release }}
-        # RELEASE_ALIASES="${{ inputs.image_release_aliases }}"
-        # DISTRO_TITLE="${{ inputs.image_title }}"
-        # REQUIREMENTS="${{ inputs.image_requirements }}"
+        CONFIG: "${{ inputs.target }}/config.yml"
+        RELEASE=${{ inputs.release }}
+        RELEASE_ALIASES="${{ inputs.image_release_aliases }}"
+        DISTRO_TITLE="${{ inputs.image_title }}"
+        REQUIREMENTS="${{ inputs.image_requirements }}"
 
         mkdir -p "${{ inputs.target }}"
 
@@ -65,4 +59,4 @@ runs:
             done <<< "${REQUIREMENTS}"
         fi
 
-        cat "${CONFIG}"
+        cat "${CONFIG}" || true

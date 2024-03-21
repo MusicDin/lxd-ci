@@ -65,8 +65,15 @@ jobs:
               -o image.variant=${{ matrix.variant }} \
               -o source.url="http://ftp.us.debian.org/debian"
 
-      - name: Print build artifacts
-        run: ls -lah "${{ env.target }}"
+      - name: Build image config
+        uses: ./.github/actions/image-config
+        with:
+          target: ${{ env.target }}
+          release: ${{ matrix.release }}
+          image_release_aliases: |-
+            bullseye = 11
+            bookworm = 12
+            trixie   = 13
 
       - name: Test container image
         uses: ./.github/actions/image-test
