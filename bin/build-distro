@@ -14,10 +14,6 @@ TIMEOUT=${4}
 TARGET=${5}
 shift 5
 
-# Create serail and update target directory.
-SERIAL=$(date -u +%Y%m%d_%H%M)
-TARGET="${TARGET}/${SERIAL}"
-
 # Setup build directory.
 CACHE_DIR="${TARGET}/cache"
 mkdir -p "${CACHE_DIR}"
@@ -25,7 +21,8 @@ mkdir -p "${CACHE_DIR}"
 cd "${TARGET}"
 cp "${YAML}" image.yaml
 
-# Get lxd-imagebuilder path.
+# Create serial and get lxd-imagebuilder path.
+SERIAL=$(date -u +%Y%m%d_%H%M)
 BUILDER=$(which lxd-imagebuilder)
 
 # Build plain rootfs.
