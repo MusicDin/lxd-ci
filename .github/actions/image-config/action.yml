@@ -6,13 +6,13 @@ inputs:
     description: Directory where config.yaml is generated
     required: true
   release:
-    description: Image release
+    description: Image release name
     required: true
   image_release_aliases:
-    description: Mapping of the release and its aliases
+    description: Mapping of the release name and its aliases
     default: ""
-  image_title:
-    description: Image title
+  image_release_title:
+    description: Image release title
     default: ""
   image_requirements:
     description: Image requirements
@@ -27,13 +27,13 @@ runs:
         CONFIG="${{ inputs.target }}/config.yaml"
         RELEASE=${{ inputs.release }}
         RELEASE_ALIASES="${{ inputs.image_release_aliases }}"
-        DISTRO_TITLE="${{ inputs.image_title }}"
+        RELEASE_TITLE="${{ inputs.image_release_title }}"
         REQUIREMENTS="${{ inputs.image_requirements }}"
 
         mkdir -p "${{ inputs.target }}"
 
-        if [ -n "${DISTRO_TITLE}" ]; then
-            echo "distro_title: '${DISTRO_TITLE}'" >> "${CONFIG}"
+        if [ -n "${RELEASE_TITLE}" ]; then
+            echo "release_title: '${RELEASE_TITLE}'" >> "${CONFIG}"
         fi
 
         while IFS='=' read -r key alias; do
