@@ -73,5 +73,5 @@ runs:
         #
         scp -srpC -v -P ${SSH_PORT} -i ~/.ssh/imageserver_id_rsa \
           ${SRC_DIR}-upload/* \
-          "${SSH_USER}@${SSH_IP}:."
+          "${SSH_USER}@${SSH_IP}:"
 
