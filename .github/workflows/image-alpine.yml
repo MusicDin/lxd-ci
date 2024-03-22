@@ -73,7 +73,7 @@ jobs:
         with:
           target: ${{ env.target }}
           release: ${{ matrix.release }}
-          image_requirements: |
+          requirements: |
             secure_boot = false
 
       - name: Test container image

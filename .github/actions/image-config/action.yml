@@ -8,14 +8,11 @@ inputs:
   release:
     description: Image release name
     required: true
-  image_release_aliases:
-    description: Mapping of the release name and its aliases
+  release_aliases:
+    description: Image release aliases as a list of release=aliases pairs.
     default: ""
-  image_release_title:
-    description: Image release title
-    default: ""
-  image_requirements:
-    description: Image requirements
+  requirements:
+    description: Image requirements as a list of key=value pairs.
     default: ""
 
 runs:
@@ -23,40 +20,23 @@ runs:
   steps:
     - name: Generate config.yaml
       shell: bash
+      env:
+        CONFIG: "${{ inputs.target }}/config.yaml"
+        RELEASE: "${{ inputs.release }}"
+        RELEASE_ALIASES: "${{ inputs.image_release_aliases }}"
+        REQUIREMENTS: "${{ inputs.image_requirements }}"
       run: |
-        CONFIG="${{ inputs.target }}/config.yaml"
-        RELEASE=${{ inputs.release }}
-        RELEASE_ALIASES="${{ inputs.image_release_aliases }}"
-        RELEASE_TITLE="${{ inputs.image_release_title }}"
-        REQUIREMENTS="${{ inputs.image_requirements }}"
-
-        mkdir -p "${{ inputs.target }}"
-
-        if [ -n "${RELEASE_TITLE}" ]; then
-            echo "release_title: '${RELEASE_TITLE}'" >> "${CONFIG}"
+        # Config release aliases.
+        aliases=$(echo "${RELEASE_ALIASES}" | grep -w "^${RELEASE}" | cut -d '=' -f2- | tr -d ' ')
+        if [ -n "${aliases}" ]; then
+            echo "release_aliases: ${aliases}" >> ${CONFIG}
         fi
 
-        while IFS='=' read -r key alias; do
-            key=$(echo "${key}" | tr -d ' ')
-            alias=$(echo "${alias}" | tr -d ' ')
+        # Config requirements.
+        if [ -n "${req}" ]; then
+            echo "requirements:" >> ${CONFIG}
 
-            if [ "${key}" = "${RELEASE}" ] && [ -n "${alias}" ]; then
-                echo "release_alias: ${alias}" >> "${CONFIG}"
-                break
-            fi
-        done <<< "${RELEASE_ALIASES}"
-
-        if [ -n "${REQUIREMENTS}" ]; then
-            echo "requirements:" >> "${CONFIG}"
-
-            while IFS='=' read -r key val; do
-                key=$(echo "${key}" | tr -d ' ')
-                val=$(echo "${val}" | tr -d ' ')
-
-                if [ -n "${key}" ] && [ -n "${val}" ]; then
-                    echo "  ${key}: ${val}" >> "${CONFIG}"
-                fi
-            done <<< "${REQUIREMENTS}"
+            # Remove spaces, replace equal sign (=) with semi colon (:) and
+            # add two leading spaces.
+            echo "${req}" | sed 's/^ *\([^ ]\+\) *= */  \1: /' >> ${CONFIG}
         fi
-
-        cat "${CONFIG}" || true
