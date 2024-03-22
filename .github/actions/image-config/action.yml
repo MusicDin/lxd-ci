@@ -23,8 +23,8 @@ runs:
       env:
         CONFIG: "${{ inputs.target }}/config.yaml"
         RELEASE: "${{ inputs.release }}"
-        RELEASE_ALIASES: "${{ inputs.image_release_aliases }}"
-        REQUIREMENTS: "${{ inputs.image_requirements }}"
+        RELEASE_ALIASES: "${{ inputs.release_aliases }}"
+        REQUIREMENTS: "${{ inputs.requirements }}"
       run: |
         # Config release aliases.
         aliases=$(echo "${RELEASE_ALIASES}" | grep -w "^${RELEASE}" | cut -d '=' -f2- | tr -d ' ')
@@ -33,10 +33,12 @@ runs:
         fi
 
         # Config requirements.
-        if [ -n "${req}" ]; then
+        if [ -n "${REQUIREMENTS}" ]; then
             echo "requirements:" >> ${CONFIG}
 
             # Remove spaces, replace equal sign (=) with semi colon (:) and
             # add two leading spaces.
-            echo "${req}" | sed 's/^ *\([^ ]\+\) *= */  \1: /' >> ${CONFIG}
+            echo "${REQUIREMENTS}" | sed 's/^ *\([^ ]\+\) *= */  \1: /' >> ${CONFIG}
         fi
+
+        cat ${CONFIG} 2>/dev/null || true
