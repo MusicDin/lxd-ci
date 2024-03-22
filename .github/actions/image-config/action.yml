@@ -21,11 +21,17 @@ runs:
     - name: Generate config.yaml
       shell: bash
       env:
-        CONFIG: "${{ inputs.target }}/config.yaml"
+        TARGET: "${{ inputs.target }}"
         RELEASE: "${{ inputs.release }}"
         RELEASE_ALIASES: "${{ inputs.release_aliases }}"
         REQUIREMENTS: "${{ inputs.requirements }}"
       run: |
+        # Expand target path.
+        TARGET=$(echo "${TARGET}")
+        CONFIG="${TARGET}/config.yaml"
+
+        mkdir -p "${TARGET}"
+
         # Config release aliases.
         aliases=$(echo "${RELEASE_ALIASES}" | grep -w "^${RELEASE}" | cut -d '=' -f2- | tr -d ' ')
         if [ -n "${aliases}" ]; then
