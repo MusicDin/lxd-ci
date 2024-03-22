@@ -63,9 +63,6 @@ jobs:
               -o image.release=${{ matrix.release }} \
               -o source.url="https://mirrors.servercentral.com/voidlinux/live/current/"
 
-      - name: Print build artifacts
-        run: ls -lah "${{ env.target }}"
-
       - name: Test container image
         uses: ./.github/actions/image-test
         if: contains(env.type, 'container')

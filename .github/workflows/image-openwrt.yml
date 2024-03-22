@@ -57,9 +57,6 @@ jobs:
               -o image.architecture="${IMAGE_ARCH}" \
               -o image.release=${{ matrix.release }}
 
-      - name: Print build artifacts
-        run: ls -lah "${{ env.target }}"
-
       - name: Test container image
         uses: ./.github/actions/image-test
         if: contains(env.type, 'container')

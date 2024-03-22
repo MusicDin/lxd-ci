@@ -53,9 +53,6 @@ jobs:
               -o image.release=kali-rolling \
               -o image.variant=${{ matrix.variant }}
 
-      - name: Print build artifacts
-        run: ls -lah "${{ env.target }}"
-
       - name: Test container image
         uses: ./.github/actions/image-test
         if: contains(env.type, 'container')
