@@ -59,8 +59,8 @@ runs:
         mkdir -p "${PRODUCT_PATH}/${VERSION}"
 
         # Move config.yml file if exists.
-        if [ -f "${SRC_DIR}/config.yml" ]; then
-            mv "${SRC_DIR}/config.yml" "${PRODUCT_PATH}"
+        if [ -f "${SRC_DIR}/config.yaml" ]; then
+            mv "${SRC_DIR}/config.yaml" "${PRODUCT_PATH}"
         fi
 
         # Move image content.
