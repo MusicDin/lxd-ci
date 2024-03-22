@@ -21,10 +21,10 @@ inputs:
 runs:
   using: composite
   steps:
-    - name: Generate config.yml
+    - name: Generate config.yaml
       shell: bash
       run: |
-        CONFIG="${{ inputs.target }}/config.yml"
+        CONFIG="${{ inputs.target }}/config.yaml"
         RELEASE=${{ inputs.release }}
         RELEASE_ALIASES="${{ inputs.image_release_aliases }}"
         DISTRO_TITLE="${{ inputs.image_title }}"
@@ -40,7 +40,7 @@ runs:
             key=$(echo "${key}" | tr -d ' ')
             alias=$(echo "${alias}" | tr -d ' ')
 
-            if [ "${key}" == "${RELEASE}" ] || [ -n "${alias}" ]; then
+            if [ "${key}" = "${RELEASE}" ] && [ -n "${alias}" ]; then
                 echo "release_alias: ${alias}" >> "${CONFIG}"
                 break
             fi

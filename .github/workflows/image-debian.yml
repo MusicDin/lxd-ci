@@ -71,6 +71,7 @@ jobs:
           target: ${{ env.target }}
           release: ${{ matrix.release }}
           image_release_aliases: |-
+            buster   = 10
             bullseye = 11
             bookworm = 12
             trixie   = 13
