@@ -71,7 +71,12 @@ runs:
         # p -> Preserves modification and access times
         # C -> Enables compression
         #
-        scp -srpC -v -P ${SSH_PORT} -i ~/.ssh/imageserver_id_rsa \
-          ${SRC_DIR}-upload/* \
-          "${SSH_USER}@${SSH_IP}:"
+        # scp -srpC -v -P ${SSH_PORT} -i ~/.ssh/imageserver_id_rsa \
+        #   ${SRC_DIR}-upload/* \
+        #   "${SSH_USER}@${SSH_IP}:"
 
+        # Use SFTP to upload images to the server.
+        sftp -P ${SSH_PORT} "${SSH_USER}@${SSH_HOST}" <<EOF
+            put -r "${SRC_DIR}-upload/*"
+            bye
+        EOF
