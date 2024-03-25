@@ -35,9 +35,10 @@ runs:
         SSH_PORT: ${{ inputs.ssh_port }}
       run : |
         # Store image server private key.
-        mkdir -p ~/.ssh
-        echo "${{ inputs.ssh_private_key }}" > ~/.ssh/imageserver_id_rsa
-        chmod 600 ~/.ssh/imageserver_id_rsa
+        mkdir -p -m 0700 ~/.ssh
+        touch ~/.ssh/id_ed25519
+        chmod 0600 ~/.ssh/id_ed25519
+        echo "${{ inputs.ssh_private_key }}" > ~/.ssh/id_ed25519
 
         # Configure known host.
         ssh-keyscan -H -p ${SSH_PORT} ${SSH_IP} >> ~/.ssh/known_hosts
