@@ -76,10 +76,8 @@ runs:
         #   ${SRC_DIR}-upload/* \
         #   "${SSH_USER}@${SSH_HOST}:"
 
-        cd "${SRC_DIR}-upload"
-
         # Use SFTP to upload images to the server.
         sftp -P ${SSH_PORT} "${SSH_USER}@${SSH_HOST}" <<EOF
-            put -r *
+            put -r ${SRC_DIR}-upload/*
             bye
         EOF
