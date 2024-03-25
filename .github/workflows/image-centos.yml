@@ -5,7 +5,7 @@ on:
     inputs:
       publish:
         type: boolean
-        default: false
+        default: true
         description: Publish built image
   workflow_call:
     inputs:
