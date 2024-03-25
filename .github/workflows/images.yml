@@ -30,9 +30,9 @@ jobs:
   # busybox:
   #   uses: ./.github/workflows/image-busybox.yml
   #   secrets: inherit
-  centos:
-    uses: ./.github/workflows/image-centos.yml
-    secrets: inherit
+  # centos:
+  #   uses: ./.github/workflows/image-centos.yml
+  #   secrets: inherit
   debian:
     uses: ./.github/workflows/image-debian.yml
     secrets: inherit
