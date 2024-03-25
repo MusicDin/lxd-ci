@@ -68,13 +68,13 @@ jobs:
               -o image.release=${{ matrix.release }} \
               -o image.variant=${{ matrix.variant }}
 
-      - name: Build image config
-        uses: ./.github/actions/image-config
-        with:
-          target: ${{ env.target }}
-          release: ${{ matrix.release }}
-          requirements: |
-            secure_boot = false
+      # - name: Build image config
+      #   uses: ./.github/actions/image-config
+      #   with:
+      #     target: ${{ env.target }}
+      #     release: ${{ matrix.release }}
+      #     requirements: |
+      #       secure_boot = false
 
       - name: Test container image
         uses: ./.github/actions/image-test
