@@ -45,7 +45,7 @@ runs:
     - name: Rsync artifacts to the image server
       shell: bash
       env:
-        SSH_IP: ${{ inputs.ssh_ip }}
+        SSH_HOST: ${{ inputs.ssh_ip }}
         SSH_USER: ${{ inputs.ssh_user }}
         SSH_PORT: ${{ inputs.ssh_port }}
       run: |
@@ -73,7 +73,7 @@ runs:
         #
         # scp -srpC -v -P ${SSH_PORT} -i ~/.ssh/imageserver_id_rsa \
         #   ${SRC_DIR}-upload/* \
-        #   "${SSH_USER}@${SSH_IP}:"
+        #   "${SSH_USER}@${SSH_HOST}:"
 
         # Use SFTP to upload images to the server.
         sftp -P ${SSH_PORT} "${SSH_USER}@${SSH_HOST}" <<EOF
