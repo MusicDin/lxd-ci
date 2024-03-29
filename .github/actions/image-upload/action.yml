@@ -55,29 +55,19 @@ runs:
         IMG_DIR=${{ inputs.image_dir }}
         VERSION=$(cat "${SRC_DIR}/serial")
 
+        # First upload contents to the temporary dir and once fully uploaded
+        # move the directory to the final destination to avoid potential race
+        # where simplestream-maintainer includes partially uploaded images.
+        TMP_DIR="${IMG_DIR}/.${VERSION}"
+        DST_DIR="${IMG_DIR}/${VERSION}"
+
         # Create directory structure that will be mirrored on the target server.
-        PRODUCT_PATH="${SRC_DIR}-upload/${IMG_DIR}"
-        mkdir -p "${PRODUCT_PATH}/${VERSION}"
-
-        # Move config.yml file if exists.
-        if [ -f "${SRC_DIR}/config.yaml" ]; then
-            mv "${SRC_DIR}/config.yaml" "${PRODUCT_PATH}"
-        fi
-
-        # Move image content.
-        mv ${SRC_DIR}/* "${PRODUCT_PATH}/${VERSION}"
-
-        # s -> Uses SFTP protocol
-        # r -> Copies files recursively
-        # p -> Preserves modification and access times
-        # C -> Enables compression
-        #
-        # scp -srpC -v -P ${SSH_PORT} -i ~/.ssh/imageserver_id_rsa \
-        #   ${SRC_DIR}-upload/* \
-        #   "${SSH_USER}@${SSH_HOST}:"
+        mkdir -p "${SRC_DIR}-upload/${TMP_DIR}"
+        mv ${SRC_DIR}/* "${SRC_DIR}-upload/${TMP_DIR}"
 
         # Use SFTP to upload images to the server.
         sftp -P ${SSH_PORT} "${SSH_USER}@${SSH_HOST}" <<EOF
             put -r ${SRC_DIR}-upload/*
+            rename "${TMP_DIR}" "${DST_DIR}"
             bye
         EOF
