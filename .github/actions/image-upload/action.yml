@@ -55,19 +55,16 @@ runs:
         IMG_DIR=${{ inputs.image_dir }}
         VERSION=$(cat "${SRC_DIR}/serial")
 
+        # Create directory structure that will be mirrored on the target server.
+        mkdir -p "${SRC_DIR}-upload/${IMG_DIR}/.${VERSION}"
+        mv ${SRC_DIR}/* "${SRC_DIR}-upload/${IMG_DIR}/.${VERSION}"
+
         # First upload contents to the temporary dir and once fully uploaded
         # move the directory to the final destination to avoid potential race
         # where simplestream-maintainer includes partially uploaded images.
-        TMP_DIR="${IMG_DIR}/.${VERSION}"
-        DST_DIR="${IMG_DIR}/${VERSION}"
-
-        # Create directory structure that will be mirrored on the target server.
-        mkdir -p "${SRC_DIR}-upload/${TMP_DIR}"
-        mv ${SRC_DIR}/* "${SRC_DIR}-upload/${TMP_DIR}"
-
-        # Use SFTP to upload images to the server.
-        sftp -P ${SSH_PORT} "${SSH_USER}@${SSH_HOST}" <<EOF
-            put -r ${SRC_DIR}-upload/*
-            rename "${TMP_DIR}" "${DST_DIR}"
+        sftp -P ${SSH_PORT} "${SSH_USER}@${SSH_HOST}" -b - <<EOF
+            put -R ${SRC_DIR}-upload/*
+            rename "${IMG_DIR}/.${VERSION}" "${IMG_DIR}/${VERSION}"
             bye
         EOF
+
