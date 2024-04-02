@@ -3,7 +3,8 @@ image:
 
 simplestream:
   requirements:
-    secure_boot: false
+  - requirements:
+      secure_boot: false
 
 source:
   downloader: alpinelinux-http

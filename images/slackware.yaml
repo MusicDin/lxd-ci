@@ -6,28 +6,28 @@ source:
   url: https://mirrors.slackware.com/slackware/
 
 packages:
-    manager: slackpkg
-    sets:
-        - packages:
-            - sudo
-          action: install
+  manager: slackpkg
+  sets:
+  - packages:
+    - sudo
+    action: install
 
 actions:
-    - trigger: post-unpack
-      action: |-
-        #!/bin/bash
-        touch /var/lib/slackpkg/current
-      releases:
-      - current
+- trigger: post-unpack
+  action: |-
+    #!/bin/bash
+    touch /var/lib/slackpkg/current
+  releases:
+  - current
 
-    - trigger: post-unpack
-      action: |-
-        #!/bin/bash
-        update-ca-certificates -f
-        slackpkg update gpg
-      releases:
-      - 15.0
-      - current
+- trigger: post-unpack
+  action: |-
+    #!/bin/bash
+    update-ca-certificates -f
+    slackpkg update gpg
+  releases:
+  - 15.0
+  - current
 
 files:
 - name: hostname
