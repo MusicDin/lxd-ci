@@ -85,4 +85,7 @@ jobs:
         with:
           target: ${{ env.target }}
           image_dir: "${{ env.distro }}/${{ matrix.release }}/${{ matrix.architecture }}/${{ matrix.variant }}"
-          ssh_private_key: "${{ secrets.LXD_INFRA_IMAGES_KEY }}"
+          ssh_ip: "${{ secrets.IMAGESERVER_SSH_IP }}"
+          ssh_port: "${{ secrets.IMAGESERVER_SSH_PORT }}"
+          ssh_user: "${{ secrets.IMAGESERVER_SSH_USER }}"
+          ssh_private_key: "${{ secrets.IMAGESERVER_SSH_PK }}"
