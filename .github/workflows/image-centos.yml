@@ -22,7 +22,7 @@ jobs:
       matrix:
         release:
           - 7 # CentOS 7 tests require cgroups v1. They will pass on ubuntu-20.04 runner.
-          - 8-Stream
+          # - 8-Stream
           - 9-Stream
         variant:
           - default

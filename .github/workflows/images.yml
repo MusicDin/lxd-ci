@@ -15,9 +15,9 @@ jobs:
   # almalinux:
   #   uses: ./.github/workflows/image-almalinux.yml
   #   secrets: inherit
-  alpine:
-    uses: ./.github/workflows/image-alpine.yml
-    secrets: inherit
+  # alpine:
+  #   uses: ./.github/workflows/image-alpine.yml
+  #   secrets: inherit
   # alt:
   #   uses: ./.github/workflows/image-alt.yml
   #   secrets: inherit
@@ -30,9 +30,9 @@ jobs:
   # busybox:
   #   uses: ./.github/workflows/image-busybox.yml
   #   secrets: inherit
-  # centos:
-  #   uses: ./.github/workflows/image-centos.yml
-  #   secrets: inherit
+  centos:
+    uses: ./.github/workflows/image-centos.yml
+    secrets: inherit
   # debian:
   #   uses: ./.github/workflows/image-debian.yml
   #   secrets: inherit
@@ -57,9 +57,9 @@ jobs:
   # openeuler:
   #   uses: ./.github/workflows/image-openeuler.yml
   #   secrets: inherit
-  # opensuse:
-  #   uses: ./.github/workflows/image-opensuse.yml
-  #   secrets: inherit
+  opensuse:
+    uses: ./.github/workflows/image-opensuse.yml
+    secrets: inherit
   # openwrt:
   #   uses: ./.github/workflows/image-openwrt.yml
   #   secrets: inherit

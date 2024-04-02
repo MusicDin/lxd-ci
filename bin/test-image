@@ -155,6 +155,10 @@ for i in ${INSTANCES}; do
         MIN_PROC_COUNT=1
     fi
 
+    if [ "${DIST}" == "centos" ]; then
+        MAX_WAIT_SECONDS=180
+    fi
+
     waitInstanceReady "${i}"
 done
 

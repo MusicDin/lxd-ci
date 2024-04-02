@@ -27,12 +27,37 @@ runs:
       run: |
         sudo apt-get -qq update
         sudo apt-get install -y --no-install-recommends \
+            btrfs-progs \
+            build-essential \
+            ca-certificates \
+            curl \
             debootstrap \
-            qemu-utils \
+            dirmngr \
+            dosfstools \
+            gcc \
+            gdisk \
             git \
             gpg \
+            gpg-agent \
+            kpartx \
+            libc6-dev \
+            libncurses-dev \
+            make \
+            mawk \
+            patch \
+            python3 \
+            qemu-utils \
             rsync \
-            squashfs-tools
+            squashfs-tools \
+            unzip \
+            xz-utils \
+            zstd
+            # debootstrap \
+            # qemu-utils \
+            # git \
+            # gpg \
+            # rsync \
+            # squashfs-tools
 
     - name: Install Go ${{ inputs.go-version }}
       uses: actions/setup-go@v5
