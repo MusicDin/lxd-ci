@@ -13,6 +13,9 @@ on:
         type: boolean
         default: true
         description: Publish built image
+  schedule:
+    # test - trigger every 5 minutes.
+    - cron: "*/5 * * * *"
 
 jobs:
   alpine:
