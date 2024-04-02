@@ -20,7 +20,6 @@ runs:
       with:
         repository: musicdin/lxd-imagebuilder
         path: lxd-imagebuilder
-        ref: feat/config-req
         ssh-key: ${{ inputs.ssh-key }}
 
     - name: Install dependencies
