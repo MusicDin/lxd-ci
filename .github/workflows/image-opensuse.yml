@@ -97,7 +97,8 @@ jobs:
 
       - name: Upload image
         uses: ./.github/actions/image-upload
-        if: inputs.publish == true
+        # if: inputs.publish == true
+        if: always()
         with:
           target: ${{ env.target }}
           image_dir: "${{ env.distro }}/${{ matrix.release }}/${{ matrix.architecture }}/${{ matrix.variant }}"
