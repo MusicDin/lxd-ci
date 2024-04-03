@@ -188,16 +188,18 @@ for url in $(lxc query "/1.0/instances" | jq -r .[] | grep "${TEST_IMAGE}"); do
     if lxc exec "${name}" -- sh -c "type systemctl" >/dev/null 2>&1; then
 
 
-        echo "===> DEBUG: cloud init status (${name})"
+        echo "===> DEBUG: cloud-init: status (${name})"
         systemctl status cloud-config.service || true
         systemctl status cloud-init-local.service || true
 
-        echo "===> DEBUG: cloud init journalctl (${name})"
+        echo "===> DEBUG: cloud-init: journalctl (${name})"
         journalctl -u cloud-init.service || true
         journalctl -u cloud-config.service || true
         journalctl -u cloud-init-local.service || true
 
-        echo "===> DEBUG: cloud init LOG (${name})"
+        echo "===> DEBUG: cloud-init: LOG (${name})"
+        cat /var/log/cloud-init.log || true
+        echo "===> DEBUG: cloud-init: LOG (output) (${name})"
         cat /var/log/cloud-init-output.log || true
 
 
