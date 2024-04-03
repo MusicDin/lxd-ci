@@ -1,6 +1,9 @@
 image:
   distribution: openSUSE
 
+simplestream:
+  distro_name: OpenSUSE
+
 source:
   downloader: opensuse-http
   keys:
@@ -401,6 +404,23 @@ actions:
   - tumbleweed
   variants:
   - cloud
+
+# - trigger: post-packages
+#   action: |-
+#     #!/bin/sh
+#     set -eux
+
+#     # Timezone
+#     rm -f /etc/localtime
+#     ln -s /usr/share/zoneinfo/UTC /etc/localtime
+#     echo UTC > /etc/timezone
+
+#     # Locale
+#     echo LANG=en_US.UTF-8 > /etc/locale.conf
+#   releases:
+#   - 15.5
+#   variants:
+#   - cloud
 
 - trigger: post-packages
   action: |-
