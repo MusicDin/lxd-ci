@@ -51,18 +51,10 @@ runs:
       with:
         go-version: "${{ inputs.go-version }}"
 
-    # - name: Clone LXD imagebuilder
-    #   shell: bash
-    #   run: |
-    #     git clone https://github.com/canonical/lxd-imagebuilder --depth 1
-
-    - name: Checkout LXD imagebuilder
-      uses: actions/checkout@v4
-      with:
-        repository: musicdin/lxd-imagebuilder
-        path: lxd-imagebuilder
-        # token: ${{ inputs.token }}
-        ssh-key: ${{ inputs.deploy-key }}
+    - name: Clone LXD imagebuilder
+      shell: bash
+      run: |
+        git clone https://github.com/canonical/lxd-imagebuilder --depth 1
 
     - name: Build LXD imagebuilder
       shell: bash
