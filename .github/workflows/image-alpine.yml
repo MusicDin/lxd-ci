@@ -44,7 +44,8 @@ jobs:
         variant:
           - default
           - cloud
-        build: "${{ inputs.booltrue == 'true' }}"
+        build:
+          - "${{ inputs.booltrue == true }}"
         exclude:
           - { build: false }
 
