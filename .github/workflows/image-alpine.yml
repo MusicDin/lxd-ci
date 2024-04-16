@@ -47,6 +47,9 @@ jobs:
         build: "${{ inputs.booltrue == 'true' }}"
         exclude:
           - { build: false }
+
+    steps:
+      - run: echo "Executed ${{ matrix.release }}/${{ matrix.variant }}/${{ matrix.architecture }}"
     # env:
     #   type: "container"
     #   distro: "${{ github.job }}"
