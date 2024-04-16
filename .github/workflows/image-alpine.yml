@@ -2,7 +2,6 @@ name: Build Alpine Images
 
 on:
   workflow_dispatch:
-  workflow_call:
     inputs:
       publish:
         type: boolean
