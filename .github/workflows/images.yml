@@ -65,9 +65,9 @@ jobs:
   # archlinux:
   #   uses: ./.github/workflows/image-archlinux.yml
   #   secrets: inherit
-  busybox:
-    uses: ./.github/workflows/image-busybox.yml
-    secrets: inherit
+  # busybox:
+  #   uses: ./.github/workflows/image-busybox.yml
+  #   secrets: inherit
   # centos:
   #   uses: ./.github/workflows/image-centos.yml
   #   secrets: inherit
@@ -89,12 +89,12 @@ jobs:
   # kali:
   #   uses: ./.github/workflows/image-kali.yml
   #   secrets: inherit
-  # mint:
-  #   uses: ./.github/workflows/image-mint.yml
-  #   secrets: inherit
-  nixos:
-    uses: ./.github/workflows/image-nixos.yml
+  mint:
+    uses: ./.github/workflows/image-mint.yml
     secrets: inherit
+  # nixos:
+  #   uses: ./.github/workflows/image-nixos.yml
+  #   secrets: inherit
   # openeuler:
   #   uses: ./.github/workflows/image-openeuler.yml
   #   secrets: inherit
@@ -119,6 +119,6 @@ jobs:
   # voidlinux:
   #   uses: ./.github/workflows/image-voidlinux.yml
   #   secrets: inherit
-  slackware:
-    uses: ./.github/workflows/image-slackware.yml
-    secrets: inherit
+  # slackware:
+  #   uses: ./.github/workflows/image-slackware.yml
+  #   secrets: inherit
