@@ -25,7 +25,7 @@ jobs:
         architecture:
           - amd64
     env:
-      type: "container"
+      type: "container,vm"
       distro: "${{ github.job }}"
       target: "${HOME}/build"
 
