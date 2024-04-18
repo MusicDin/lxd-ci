@@ -17,13 +17,8 @@ jobs:
       fail-fast: false
       matrix:
         release:
-          # - ulyana
-          # - ulyssa
-          # - uma
           - una
-          - vanessa
-          # - vera
-          # - victoria
+          - virginia
         variant:
           - default
           - cloud
