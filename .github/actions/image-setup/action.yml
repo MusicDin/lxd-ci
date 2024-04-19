@@ -49,7 +49,7 @@ runs:
     - name: Setup LXD Imagebuilder ${{ inputs.lxd-imagebuilder-channel }}
       shell: bash
       run: |
-        sudo snap install lxd-imagebuilder --channel=${{ inputs.lxd-imagebuilder-channel }}
+        sudo snap install lxd-imagebuilder --channel=${{ inputs.lxd-imagebuilder-channel }} --classic
         lxd-imagebuilder --version
 
     - name: Setup LXD ${{ inputs.lxd-channel }}
