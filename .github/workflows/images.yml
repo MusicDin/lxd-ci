@@ -53,12 +53,12 @@ jobs:
   # almalinux:
   #   uses: ./.github/workflows/image-almalinux.yml
   #   secrets: inherit
-  alpine:
-    uses: ./.github/workflows/image-alpine.yml
-    secrets: inherit
-  # alt:
-  #   uses: ./.github/workflows/image-alt.yml
+  # alpine:
+  #   uses: ./.github/workflows/image-alpine.yml
   #   secrets: inherit
+  alt:
+    uses: ./.github/workflows/image-alt.yml
+    secrets: inherit
   # amazonlinux:
   #   uses: ./.github/workflows/image-amazonlinux.yml
   #   secrets: inherit
@@ -80,9 +80,9 @@ jobs:
   # fedora:
   #   uses: ./.github/workflows/image-fedora.yml
   #   secrets: inherit
-  funtoo:
-    uses: ./.github/workflows/image-funtoo.yml
-    secrets: inherit
+  # funtoo:
+  #   uses: ./.github/workflows/image-funtoo.yml
+  #   secrets: inherit
   # gentoo:
   #   uses: ./.github/workflows/image-gentoo.yml
   #   secrets: inherit
