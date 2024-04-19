@@ -5,7 +5,7 @@ inputs:
   lxd-channel:
     description: LXD snap channel to install
     default: 5.21/stable
-  lxd-imagebuilder:
+  lxd-imagebuilder-channel:
     description: LXD imagebuilder snap channel to install
     default: latest/edge
   # go-version:
@@ -46,10 +46,10 @@ runs:
             xz-utils \
             zstd
 
-    - name: Setup LXD Imagebuilder ${{ inputs.lxd-channel }}
+    - name: Setup LXD Imagebuilder ${{ inputs.lxd-imagebuilder-channel }}
       shell: bash
       run: |
-        sudo snap install lxd-imagebuilder --channel=${{ inputs.lxd-channel }}
+        sudo snap install lxd-imagebuilder --channel=${{ inputs.lxd-imagebuilder-channel }}
         lxd-imagebuilder --version
 
     - name: Setup LXD ${{ inputs.lxd-channel }}
