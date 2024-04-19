@@ -16,12 +16,12 @@ jobs:
       fail-fast: false
       matrix:
         release:
-          - xenial
+          # - xenial
           # - bionic
           # - focal
           # - jammy
           # - mantic
-          # - noble
+          - noble
         architecture:
           - amd64
           # - arm64

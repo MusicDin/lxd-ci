@@ -56,9 +56,9 @@ jobs:
   # alpine:
   #   uses: ./.github/workflows/image-alpine.yml
   #   secrets: inherit
-  alt:
-    uses: ./.github/workflows/image-alt.yml
-    secrets: inherit
+  # alt:
+  #   uses: ./.github/workflows/image-alt.yml
+  #   secrets: inherit
   # amazonlinux:
   #   uses: ./.github/workflows/image-amazonlinux.yml
   #   secrets: inherit
@@ -113,9 +113,9 @@ jobs:
   # springdalelinux:
   #   uses: ./.github/workflows/image-springdalelinux.yml
   #   secrets: inherit
-  # ubuntu:
-  #   uses: ./.github/workflows/image-ubuntu.yml
-  #   secrets: inherit
+  ubuntu:
+    uses: ./.github/workflows/image-ubuntu.yml
+    secrets: inherit
   # voidlinux:
   #   uses: ./.github/workflows/image-voidlinux.yml
   #   secrets: inherit
