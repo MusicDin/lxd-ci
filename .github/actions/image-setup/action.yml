@@ -5,12 +5,12 @@ inputs:
   lxd-channel:
     description: LXD snap channel to install
     default: 5.21/stable
-  go-version:
-    description: Go version to install
-    default: 1.22.x
-  deploy-key:
-    description: Github Deploy Key
-    required: true
+  lxd-imagebuilder:
+    description: LXD imagebuilder snap channel to install
+    default: latest/edge
+  # go-version:
+  #   description: Go version to install
+  #   default: 1.22.x
 
 runs:
   using: composite
@@ -46,21 +46,11 @@ runs:
             xz-utils \
             zstd
 
-    - name: Install Go ${{ inputs.go-version }}
-      uses: actions/setup-go@v5
-      with:
-        go-version: "${{ inputs.go-version }}"
-
-    - name: Clone LXD imagebuilder
+    - name: Setup LXD Imagebuilder ${{ inputs.lxd-channel }}
       shell: bash
       run: |
-        git clone https://github.com/canonical/lxd-imagebuilder --depth 1
-
-    - name: Build LXD imagebuilder
-      shell: bash
-      run: |
-        cd lxd-imagebuilder
-        make
+        sudo snap refresh lxd-imagebuilder --channel=${{ inputs.lxd-channel }}
+        lxd-imagebuilder --version
 
     - name: Setup LXD ${{ inputs.lxd-channel }}
       shell: bash
