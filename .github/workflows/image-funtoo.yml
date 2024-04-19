@@ -19,7 +19,7 @@ jobs:
           - amd64
           # - arm64
         release:
-          - 1.4
+          - next
         variant:
           - default
     env:
