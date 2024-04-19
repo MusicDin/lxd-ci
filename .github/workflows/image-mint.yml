@@ -1,14 +1,13 @@
 name: Build Linux Mint Images
 
 on:
-  # workflow_dispatch:
-  # workflow_call:
-  #   inputs:
-  #     publish:
-  #       type: boolean
-  #       default: false
-  #       description: Publish built image
-  push:
+  workflow_dispatch:
+  workflow_call:
+    inputs:
+      publish:
+        type: boolean
+        default: false
+        description: Publish built image
 
 jobs:
   mint:
