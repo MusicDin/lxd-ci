@@ -600,12 +600,6 @@ packages:
     - vm
 
   - packages:
-    - ubuntu-advantage-tools
-    action: remove
-    releases:
-    - noble
-
-  - packages:
     - cloud-guest-utils
     action: install
     types:
