@@ -184,7 +184,7 @@ for i in ${INSTANCES}; do
 done
 
 # Give instances some extra time to boot properly.
-sleep 15
+sleep 60 # Temporary.
 lxc list "${TEST_IMAGE}"
 
 #
