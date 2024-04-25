@@ -675,16 +675,6 @@ actions:
 - trigger: post-packages
   action: |-
     #!/bin/sh
-    # Mask systemd-networkd
-    systemctl mask systemd-networkd
-  releases:
-  - noble
-  variants:
-  - desktop
-
-- trigger: post-packages
-  action: |-
-    #!/bin/sh
     set -eux
 
     # Ensure /etc/resolv.conf is symlinked to /run/systemd/resolve/stub-resolv.conf
