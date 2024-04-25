@@ -653,11 +653,34 @@ actions:
     #!/bin/sh
     set -eux
 
-    # Enable systemd-networkd
-    systemctl enable systemd-networkd
-
     # Disable UA attach
     systemctl mask ua-auto-attach
+
+  # Enable systemd-networkd. Use NetworkManager from Noble release onwards
+  # and keep systemd-networkd only on older releases to prevent breaking
+  # existing images.
+- trigger: post-packages
+  action: |-
+    #!/bin/sh
+    set -eux
+
+    # Enable systemd-networkd
+    systemctl enable systemd-networkd
+  releases:
+  - bionic
+  - focal
+  - jammy
+  - mantic
+
+- trigger: post-packages
+  action: |-
+    #!/bin/sh
+    # Mask systemd-networkd
+    systemctl mask systemd-networkd
+  releases:
+  - noble
+  variants:
+  - desktop
 
 - trigger: post-packages
   action: |-
