@@ -81,8 +81,7 @@ jobs:
 
       - name: Test container image
         uses: ./.github/actions/image-test
-        # if: contains(env.type, 'container')
-        if: always()
+        if: contains(env.type, 'container')
         with:
           type: container
           target: ${{ env.target }}
