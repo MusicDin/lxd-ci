@@ -576,6 +576,7 @@ packages:
     - iputils
     - less
     - licenses
+    - linux-firmware
     - logrotate
     - man-db
     - man-pages
