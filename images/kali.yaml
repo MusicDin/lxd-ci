@@ -1715,7 +1715,7 @@ files:
 
 packages:
   manager: apt
-  update: true
+  update: false
   cleanup: true
   sets:
   - packages:
