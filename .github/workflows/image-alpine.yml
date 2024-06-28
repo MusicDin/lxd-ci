@@ -17,7 +17,7 @@ on:
 
 jobs:
   alpine:
-    runs-on: ${{ matrix.architecture == 'arm64' && 'Ubuntu_ARM64_4C_16G_01' || 'ubuntu-latest' }}
+    runs-on: ${{ matrix.architecture == 'arm64' && 'Ubuntu_ARM64_4C_16G_01' || 'ubuntu-22.04' }}
     strategy:
       fail-fast: false
       matrix:
