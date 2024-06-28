@@ -4,7 +4,7 @@ description: Composite action that sets up the environment for building and test
 inputs:
   lxd-channel:
     description: LXD snap channel to install
-    default: latest/edge
+    default: latest/stable
   lxd-imagebuilder-channel:
     description: LXD imagebuilder snap channel to install
     default: latest/edge
