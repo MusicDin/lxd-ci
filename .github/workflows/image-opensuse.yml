@@ -23,6 +23,7 @@ jobs:
       matrix:
         release:
           - 15.5
+          - 15.6
           - tumbleweed
         variant:
           - default
