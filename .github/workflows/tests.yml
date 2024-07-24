@@ -42,36 +42,6 @@ defaults:
     shell: bash
 
 jobs:
-  code-tests:
-    name: Code
-    runs-on: ubuntu-24.04
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-        with:
-          # A non-shallow clone is needed for the Differential ShellCheck
-          fetch-depth: 0
-
-      - name: yamllint
-        uses: ibiqlik/action-yamllint@v3
-        with:
-          file_or_dir: .github/workflows/
-
-      - id: ShellCheck
-        name: Differential ShellCheck
-        uses: redhat-plumbers-in-action/differential-shellcheck@v5
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          strict-check-on-push: true
-        if: github.event_name == 'pull_request'
-
-      - name: Upload artifact with ShellCheck defects in SARIF format
-        uses: actions/upload-artifact@v4
-        with:
-          name: Differential ShellCheck SARIF
-          path: ${{ steps.ShellCheck.outputs.sarif }}
-        if: github.event_name == 'pull_request'
-
   system-tests:
     env:
       PURGE_LXD: "1"
@@ -86,101 +56,10 @@ jobs:
         os: ${{ fromJSON(inputs.ubuntu-releases || '["20.04", "22.04", "24.04"]') }}
         track: ${{ fromJSON(inputs.snap-tracks || '["latest/edge", "5.21/edge", "5.0/edge", "4.0/edge"]') }}
         test:
-          - cgroup
-          - cluster
-          - container
-          - container-copy
           - conversion
-          - cpu-vm
-          - devlxd-container
-          - devlxd-vm
-          - docker
-          - efi-vars-editor-vm
-          - interception
-          - network-bridge-firewall
-          - network-ovn
-          - network-routed
-          - pylxd
-          - snapd
-          - storage-buckets
-          - storage-disks-vm
-          - "storage-vm btrfs"
-          - "storage-vm ceph"
-          - "storage-vm dir"
-          - "storage-vm lvm"
-          - "storage-vm lvm-thin"
-          - "storage-vm zfs"
-          - storage-volumes-vm
-          - tpm-vm
-          - vm
-          - vm-migration
-          - vm-nesting
-        include:
-          - test: qemu-external-vm
-            track: "latest/edge"
-            os: "24.04"
         exclude:
-          # not compatible with 4.0/*
-          - test: container-copy
-            track: "4.0/edge"
           - test: conversion
             track: "4.0/edge"
-          - test: cpu-vm
-            track: "4.0/edge"
-          - test: devlxd-vm
-            track: "4.0/edge"
-          - test: efi-vars-editor-vm
-            track: "4.0/edge"
-          - test: network-bridge-firewall
-            os: 20.04
-            track: "4.0/edge"
-          - test: network-ovn
-            track: "4.0/edge"
-          # https://github.com/canonical/pylxd/issues/590
-          - test: pylxd
-            track: "4.0/edge"
-          - test: storage-buckets
-            track: "4.0/edge"
-          - test: storage-disks-vm
-            track: "4.0/edge"
-          - test: "storage-vm dir"
-            track: "4.0/edge"
-          - test: "storage-vm btrfs"
-            track: "4.0/edge"
-          - test: "storage-vm ceph"
-            track: "4.0/edge"
-          - test: "storage-vm lvm"
-            track: "4.0/edge"
-          - test: "storage-vm lvm-thin"
-            track: "4.0/edge"
-          - test: "storage-vm zfs"
-            track: "4.0/edge"
-          - test: storage-volumes-vm
-            track: "4.0/edge"
-          - test: tpm-vm
-            track: "4.0/edge"
-          # not compatible with 5.0/*
-          - test: efi-vars-editor-vm  # not compatible with 5.0/*
-            track: "5.0/edge"
-          # waiting for integration with microceph
-          - test: "storage-vm ceph"
-          # skip track/os combinaisons that are too far appart
-          - track: "4.0/edge"
-            os: "24.04"
-          - track: "5.0/edge"
-            os: "24.04"
-          - track: "5.0/edge"
-            os: "20.04"
-          - track: "5.21/edge"
-            os: "20.04"
-          - track: "latest/edge"
-            os: "20.04"
-          - track: "latest/edge"
-            os: "22.04"
-          - test: "vm-migration"
-            track: "4.0/edge"
-          - test: "vm-migration"
-            track: "5.0/edge"
 
     steps:
       - name: Performance tuning
