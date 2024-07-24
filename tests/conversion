@@ -217,14 +217,27 @@ lxc launch ubuntu-minimal-daily:24.04 c1
 conversion_container "c1"
 lxc delete -f c1
 
+# Unblock images remote.
+sed -i '/images\.lxd\.canonical\.com/d' /etc/hosts
+
+tmpdir="$(mktemp -d)"
+
+# Create an instance and export it to get raw image.
+lxc init images:alpine/edge vm-tmp --vm
+lxc export vm-tmp "${tmpdir}/vm-tmp.tar.gz"
+lxc delete vm-tmp
+tar -xzf "${tmpdir}/vm-tmp.tar.gz" -C "${tmpdir}"
+rm "${tmpdir}/vm-tmp.tar.gz"
+
+# Test VM migration using conversion mode. If server does not support
+# conversion API extension, lxd-migrate must fallback to migration
+# mode and successfully transfer the VM disk.
+conversion_vm vm-alpine-raw-zfs zfs "${tmpdir}/backup/virtual-machine.img" "no"
+rm -rf "${tmpdir}/backup/virtual-machine.img"
+
 # Test VM conversion using non-raw disk formats only if server supports
 # conversion API extension.
 if hasNeededAPIExtension instance_import_conversion; then
-    # Unblock images remote.
-    sed -i '/images\.lxd\.canonical\.com/d' /etc/hosts
-
-    tmpdir="$(mktemp -d)"
-
     # Test QCOW2 images.
     IMAGE_PATH="${tmpdir}/image"
 
