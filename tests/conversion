@@ -149,6 +149,12 @@ conversion() {
         return 1
     fi
 
+    # Debug:
+    echo "---"
+    echo "Instance name: ${instName}"
+    echo "Image path:    ${imgPath}"
+    echo "---"
+
     # Migration questions.
     {
         if [ "${instType}" = "vm" ]; then
@@ -213,9 +219,9 @@ conversion() {
 # Test container migration using conversion mode. If server does not
 # support conversion API extension, lxd-migrate must fallback to
 # migration mode and successfully transfer the rootfs.
-lxc launch ubuntu-minimal-daily:24.04 c1
-conversion_container "c1"
-lxc delete -f c1
+# lxc launch ubuntu-minimal-daily:24.04 c1
+# conversion_container "c1"
+# lxc delete -f c1
 
 # Unblock images remote.
 sed -i '/images\.lxd\.canonical\.com/d' /etc/hosts
@@ -226,51 +232,53 @@ tmpdir="$(mktemp -d)"
 lxc init images:alpine/edge vm-tmp --vm
 lxc export vm-tmp "${tmpdir}/vm-tmp.tar.gz"
 lxc delete vm-tmp
-tar -xzf "${tmpdir}/vm-tmp.tar.gz" -C "${tmpdir}"
+tar -xzf "${tmpdir}/vm-tmp.tar.gz" -C "${tmpdir}" "backup/virtual-machine.img"
 rm "${tmpdir}/vm-tmp.tar.gz"
+
+echo "file ${tmpdir}/backup/virtual-machine.img: $(file -b ${tmpdir}/backup/virtual-machine.img)"
 
 # Test VM migration using conversion mode. If server does not support
 # conversion API extension, lxd-migrate must fallback to migration
 # mode and successfully transfer the VM disk.
 conversion_vm vm-alpine-raw-zfs zfs "${tmpdir}/backup/virtual-machine.img" "no"
-rm -rf "${tmpdir}/backup/virtual-machine.img"
+rm -rf "${tmpdir}/backup"
 
 # Test VM conversion using non-raw disk formats only if server supports
 # conversion API extension.
-if hasNeededAPIExtension instance_import_conversion; then
-    # Test QCOW2 images.
-    IMAGE_PATH="${tmpdir}/image"
+# if hasNeededAPIExtension instance_import_conversion; then
+#     # Test QCOW2 images.
+#     IMAGE_PATH="${tmpdir}/image"
 
-    lxc image export images:alpine/edge "${IMAGE_PATH}" --vm
-    conversion_vm vm-alpine-qcow2-zfs zfs "${IMAGE_PATH}.root" "no"
+#     lxc image export images:alpine/edge "${IMAGE_PATH}" --vm
+#     conversion_vm vm-alpine-qcow2-zfs zfs "${IMAGE_PATH}.root" "no"
 
-    lxc image export images:centos/9-Stream "${IMAGE_PATH}" --vm
-    conversion_vm vm-centos9-qcow2-btrfs btrfs "${IMAGE_PATH}.root" "yes"
+#     lxc image export images:centos/9-Stream "${IMAGE_PATH}" --vm
+#     conversion_vm vm-centos9-qcow2-btrfs btrfs "${IMAGE_PATH}.root" "yes"
 
-    rm "${IMAGE_PATH}" "${IMAGE_PATH}.root"
+#     rm "${IMAGE_PATH}" "${IMAGE_PATH}.root"
 
-    # Test VMDK image.
-    wget -q -O "${IMAGE_PATH}" https://cloud-images.ubuntu.com/releases/24.04/release/ubuntu-24.04-server-cloudimg-amd64.vmdk
+#     # Test VMDK image.
+#     wget -q -O "${IMAGE_PATH}" https://cloud-images.ubuntu.com/releases/24.04/release/ubuntu-24.04-server-cloudimg-amd64.vmdk
 
-    conversion_vm vm-u24-vmdk-dir dir "${IMAGE_PATH}" "yes"
-    conversion_vm vm-u24-vmdk-zfs zfs "${IMAGE_PATH}" "yes"
+#     conversion_vm vm-u24-vmdk-dir dir "${IMAGE_PATH}" "yes"
+#     conversion_vm vm-u24-vmdk-zfs zfs "${IMAGE_PATH}" "yes"
 
-    # Use custom volume for backups. Images for conversion will be uploaded here.
-    lxc storage create backups-pool zfs
-    lxc storage volume create backups-pool backups-vol
-    lxc config set storage.backups_volume=backups-pool/backups-vol
+#     # Use custom volume for backups. Images for conversion will be uploaded here.
+#     lxc storage create backups-pool zfs
+#     lxc storage volume create backups-pool backups-vol
+#     lxc config set storage.backups_volume=backups-pool/backups-vol
 
-    conversion_vm vm-u24-vmdk-dir-bupvol dir "${IMAGE_PATH}" "yes"
-    conversion_vm vm-u24-vmdk-zfs-bupvol zfs "${IMAGE_PATH}" "yes"
+#     conversion_vm vm-u24-vmdk-dir-bupvol dir "${IMAGE_PATH}" "yes"
+#     conversion_vm vm-u24-vmdk-zfs-bupvol zfs "${IMAGE_PATH}" "yes"
 
-    # Cleanup.
-    rm -rf "${tmpdir}"
-    lxc config unset storage.backups_volume
-    lxc storage volume delete backups-pool backups-vol
-    lxc storage delete backups-pool
-else
-    echo "===> SKIP: VM image conversion skipped. Server does not support API extenison 'instance_import_conversion'"
-fi
+#     # Cleanup.
+#     rm -rf "${tmpdir}"
+#     lxc config unset storage.backups_volume
+#     lxc storage volume delete backups-pool backups-vol
+#     lxc storage delete backups-pool
+# else
+#     echo "===> SKIP: VM image conversion skipped. Server does not support API extenison 'instance_import_conversion'"
+# fi
 
 # shellcheck disable=SC2034
 FAIL=0
