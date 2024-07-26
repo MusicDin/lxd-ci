@@ -4,7 +4,7 @@ set -eu
 # Source helper functions.
 . ./bin/helpers
 
-install_deps jq unzip
+install_deps jq unzip virt-v2v
 
 # Install LXD
 install_lxd
@@ -85,8 +85,10 @@ checkDNS() {
 # 1: Name of new virtual machine.
 # 2: Type of the storage pool.
 # 3: Path to the image.
+# 4: UEFI secure boot (yes/no).
+# 5: Conversion options.
 conversion_vm() {
-    conversion vm "$1" "$2" "$3" "$4"
+    conversion vm "$1" "$2" "$3" "$4" "${5:-format}"
 }
 
 # conversion_container creates a new LXD container from the filesystem of the existing container.
@@ -94,7 +96,7 @@ conversion_vm() {
 # Input arguments:
 # 1: Name of the existing container.
 conversion_container() {
-    conversion container "$1" "" "/" "no"
+    conversion container "$1" "" "/" "no" ""
 }
 
 # conversion runs lxd-migrate for the given image path. For virtual machine, lxd-migrate is
@@ -106,6 +108,7 @@ conversion() {
     poolType=$3
     imgPath=$4
     uefi_sb=$5
+    conversionOptions=$6
 
     if [ "${instType}" = "vm" ]; then
         echo "==> TEST: Conversion: Import virtual-machine '${instName}' on '${poolType}' storage pool"
@@ -114,7 +117,7 @@ conversion() {
         hostAddr="127.0.0.1"
         instTypeCode="2" # VM in migration questioneer.
 
-        lxdMigrateCmd="lxd-migrate --conversion format"
+        lxdMigrateCmd="lxd-migrate --conversion=${conversionOptions}"
 
         # Create storage pool.
         lxc storage create "${poolName}" "${poolType}"
@@ -264,6 +267,20 @@ if hasNeededAPIExtension instance_import_conversion; then
 
     conversion_vm vm-u24-vmdk-dir-bupvol dir "${IMAGE_PATH}" "yes"
     conversion_vm vm-u24-vmdk-zfs-bupvol zfs "${IMAGE_PATH}" "yes"
+
+    rm "${IMAGE_PATH}"
+
+    # Test virtio conversion if virt-v2v-in-place meets minimum version requirements.
+    # Version will be satisfied from Ubuntu 24.04 runners onwards.
+    v2vVersion=$(virt-v2v-in-place --version | grep -oP '\d+\.\d+\.\d+')
+    minVersion="2.3.4"
+
+    if dpkg --compare-versions "${v2vVersion}" "ge" "${minVersion}"; then
+        wget -q -O "${IMAGE_PATH}" https://cloud.centos.org/centos/7/images/CentOS-7-x86_64-GenericCloud-1503.qcow2
+        conversion_vm vm-centos7-qcow2-zfs-bupvol zfs "${IMAGE_PATH}" "yes" "format,virtio"
+    else
+        echo "===> SKIP: The virt-v2v-in-place version ${v2vVersion} is lower then minimum required version ${minVersion}"
+    fi
 
     # Cleanup.
     rm -rf "${tmpdir}"
