@@ -289,7 +289,10 @@ if hasNeededAPIExtension instance_import_conversion; then
         mount --bind /sys "$MOUNT_POINT/sys"
         mount --bind /run "$MOUNT_POINT/run"
 
-        chroot "${MOUNT_POINT}" <<EOF
+        chroot "${MOUNT_POINT}" <<'EOF'
+yum clean all
+yum makecache
+yum install -y epel-release
 yum install -y cloud-init
 EOF
 
