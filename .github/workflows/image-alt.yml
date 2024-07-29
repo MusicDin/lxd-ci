@@ -23,9 +23,9 @@ jobs:
       fail-fast: false
       matrix:
         release:
-          - Sisyphus
           - p10
-          - p9
+          - p11
+          - Sisyphus
         variant:
           - default
           - cloud
