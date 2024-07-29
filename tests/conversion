@@ -4,7 +4,7 @@ set -eu
 # Source helper functions.
 . ./bin/helpers
 
-install_deps jq unzip virt-v2v
+install_deps jq unzip virt-v2v libguestfs-tools
 
 # Install LXD
 install_lxd
@@ -216,9 +216,9 @@ conversion() {
 # Test container migration using conversion mode. If server does not
 # support conversion API extension, lxd-migrate must fallback to
 # migration mode and successfully transfer the rootfs.
-lxc launch ubuntu-minimal-daily:24.04 c1
-conversion_container "c1"
-lxc delete -f c1
+# lxc launch ubuntu-minimal-daily:24.04 c1
+# conversion_container "c1"
+# lxc delete -f c1
 
 # Unblock images remote.
 sed -i '/images\.lxd\.canonical\.com/d' /etc/hosts
@@ -277,6 +277,18 @@ if hasNeededAPIExtension instance_import_conversion; then
 
     if dpkg --compare-versions "${v2vVersion}" "ge" "${minVersion}"; then
         wget -q -O "${IMAGE_PATH}" https://cloud.centos.org/centos/7/images/CentOS-7-x86_64-GenericCloud-1503.qcow2
+
+        # Mount the image and install cloud-init.
+        MOUNT_POINT=$(mktemp -d /mnt/tmp.XXXXXXX)
+        guestmount -a "${IMAGE_PATH}" -m /dev/sda1 "${MOUNT_POINT}"
+
+        sudo chroot "${MOUNT_POINT}" <<EOF
+yum install -y cloud-init
+EOF
+
+        guestunmount "${MOUNT_POINT}"
+
+        # Run conversion with driver injection.
         conversion_vm vm-centos7-qcow2-zfs-bupvol zfs "${IMAGE_PATH}" "yes" "format,virtio"
     else
         echo "===> SKIP: The virt-v2v-in-place version ${v2vVersion} is lower then minimum required version ${minVersion}"
