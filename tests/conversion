@@ -292,7 +292,7 @@ if hasNeededAPIExtension instance_import_conversion; then
 
     # Test virtio conversion if virt-v2v-in-place meets minimum version requirements.
     # Version will be satisfied from Ubuntu 24.04 runners onwards.
-    v2vVersion=$(virt-v2v-in-place --version | grep -oP '\d+\.\d+\.\d+')
+    v2vVersion=$(virt-v2v-in-place --version | grep -oP '\d+\.\d+\.\d+' || echo "0-unkown")
     minVersion="2.3.4"
 
     if dpkg --compare-versions "${v2vVersion}" "ge" "${minVersion}"; then
