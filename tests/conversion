@@ -205,7 +205,11 @@ EOF
 
     # Wait for the instance to be ready and ensure it has global ip address.
     echo "Waiting instance ${instName} to start..."
-    waitInstanceBooted "${instName}"
+    waitInstanceBooted "${instName}" || {
+        echo "Failed waiting for instance to start";
+        lxc exec "${instName}" -- cloud-init status --wait --long;
+    }
+
     sleep 10
 
     # Print the instances.
