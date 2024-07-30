@@ -188,6 +188,17 @@ conversion() {
         echo "1"
     } | $lxdMigrateCmd
 
+    lxc config set "${instName}" cloud-init.user-data - << EOF
+#cloud-config
+runcmd:
+  - mount -t 9p config /mnt
+  - cd /mnt
+  - ./install.sh
+  - cd /
+  - umount /mnt
+  - systemctl start lxd-agent  # XXX: causes a reboot
+EOF
+
     # Start the instance.
     echo "Starting instance ${instName}..."
     lxc start "${instName}"
@@ -279,33 +290,42 @@ if hasNeededAPIExtension instance_import_conversion; then
     if dpkg --compare-versions "${v2vVersion}" "ge" "${minVersion}"; then
         wget -q -O "${IMAGE_PATH}" https://cloud.centos.org/centos/7/images/CentOS-7-x86_64-GenericCloud-1503.qcow2
 
-        MOUNT_POINT=$(mktemp -d /mnt/tmp.XXXXXXX)
+        # MOUNT_POINT=$(mktemp -d /mnt/tmp.XXXXXXX)
 
         # Mount the image and install cloud-init.
-        guestmount -a "${IMAGE_PATH}" -m /dev/sda1 "${MOUNT_POINT}"
+#         guestmount -a "${IMAGE_PATH}" -m /dev/sda1 "${MOUNT_POINT}"
 
-        mount --bind /dev "$MOUNT_POINT/dev"
-        mount --bind /proc "$MOUNT_POINT/proc"
-        mount --bind /sys "$MOUNT_POINT/sys"
-        mount --bind /run "$MOUNT_POINT/run"
+#         mount --bind /dev "$MOUNT_POINT/dev"
+#         mount --bind /proc "$MOUNT_POINT/proc"
+#         mount --bind /sys "$MOUNT_POINT/sys"
+#         mount --bind /run "$MOUNT_POINT/run"
 
-        chroot "${MOUNT_POINT}" <<'EOF'
-yum clean all
-yum makecache
-yum install -y epel-release
-yum install -y cloud-init
-EOF
+#         chroot "${MOUNT_POINT}" <<'EOF'
+# yum clean all
+# yum makecache
+# yum install -y epel-release
+# yum install -y cloud-init
+# EOF
 
-        umount "$MOUNT_POINT/dev"
-        umount "$MOUNT_POINT/proc"
-        umount "$MOUNT_POINT/sys"
-        umount "$MOUNT_POINT/run"
-        umount "$MOUNT_POINT"
-        guestunmount "${MOUNT_POINT}"
+#         umount "$MOUNT_POINT/dev"
+#         umount "$MOUNT_POINT/proc"
+#         umount "$MOUNT_POINT/sys"
+#         umount "$MOUNT_POINT/run"
+#         umount "$MOUNT_POINT"
+#         guestunmount "${MOUNT_POINT}"
 
 
         # modprobe nbd max_part=8
         # qemu-nbd --connect=/dev/nbd0 "${IMAGE_PATH}"
+        # fdisk -l /dev/nbd0
+
+        # mount /dev/nbd0p1 /mnt/mydisk
+
+        # .. do something with /mnt/mydisk ...
+
+        # umount /mnt/mydisk
+
+        # qemu-nbd --disconnect /dev/nbd0
 
 
 
