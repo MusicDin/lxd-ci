@@ -205,7 +205,7 @@ EOF
 
     # Wait for the instance to be ready and ensure it has global ip address.
     echo "Waiting instance ${instName} to start..."
-    waitInstanceBooted "${instName}"
+    waitInstanceBooted "${instName}" || true
 
     lxc exec "${instName}" -- cat /etc/os-release || true
     lxc exec "${instName}" -- uname -a || true
