@@ -200,6 +200,8 @@ runcmd:
   - systemctl start lxd-agent  # XXX: causes a reboot
 EOF
 
+    lxc config show "${instName}" -e
+
     # Start the instance.
     echo "Starting instance ${instName}..."
     lxc start "${instName}"
@@ -294,7 +296,7 @@ if hasNeededAPIExtension instance_import_conversion; then
     minVersion="2.3.4"
 
     if dpkg --compare-versions "${v2vVersion}" "ge" "${minVersion}"; then
-        wget -q -O "${IMAGE_PATH}" https://cloud.centos.org/centos/7/images/CentOS-7-x86_64-GenericCloud-1503.qcow2
+        wget -q -O "${IMAGE_PATH}" https://cloud.centos.org/centos/7/images/CentOS-7-x86_64-GenericCloud.qcow2
 
         # MOUNT_POINT=$(mktemp -d /mnt/tmp.XXXXXXX)
 
