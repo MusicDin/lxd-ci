@@ -188,6 +188,7 @@ conversion() {
         echo "1"
     } | $lxdMigrateCmd
 
+    lxc config device add "${instName}" config disk source=cloud-init:config
     lxc config set "${instName}" cloud-init.user-data - << EOF
 #cloud-config
 runcmd:
