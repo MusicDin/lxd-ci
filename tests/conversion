@@ -206,6 +206,8 @@ EOF
     echo "Starting instance ${instName}..."
     lxc start "${instName}"
 
+    lxc info "${instName}" --show-log
+
     # Wait for the instance to be ready and ensure it has global ip address.
     echo "Waiting instance ${instName} to start..."
     waitInstanceBooted "${instName}" || true
