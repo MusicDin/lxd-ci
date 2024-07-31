@@ -218,7 +218,12 @@ conversion() {
 
         echo "${instName}"     # Instance name.
         echo "${imgPath}"      # Local image path (or filesystem path in case of container).
-        echo "${uefi_sb}"      # Enable UEFI secure boot.
+
+        if [ "${uefi_sb}" = "yes" ]; then
+            echo "${uefi_sb}"  # Enable UEFI secure boot.
+        else
+            echo "no"
+        fi
 
         # Configure storage pool.
         if [ "${poolName}" != "" ]; then
@@ -226,6 +231,11 @@ conversion() {
             echo "${poolName}" # Pool name.
             echo "yes"         # Configure pool size?
             echo "10GiB"       # Pool size.
+        fi
+
+        if [ "uefi_sb" = "csm" ]; then
+            echo "3"           # Set config option.
+            echo "security.csm=true"
         fi
 
         # Begin the migration with the above configuration
@@ -389,7 +399,7 @@ if hasNeededAPIExtension instance_import_conversion; then
 
 
         # Run conversion with driver injection.
-        conversion_vm vm-centos7-qcow2-zfs-bupvol dir "${IMAGE_PATH}" "no" "format,virtio"
+        conversion_vm vm-centos7-qcow2-zfs-bupvol dir "${IMAGE_PATH}" "csm" "format,virtio"
     else
         echo "===> SKIP: The virt-v2v-in-place version ${v2vVersion} is lower then minimum required version ${minVersion}"
     fi
