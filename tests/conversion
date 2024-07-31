@@ -233,7 +233,7 @@ conversion() {
             echo "10GiB"       # Pool size.
         fi
 
-        if [ "uefi_sb" = "csm" ]; then
+        if [ "${uefi_sb}" = "csm" ]; then
             echo "3"           # Set config option.
             echo "security.csm=true"
         fi
