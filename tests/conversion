@@ -86,20 +86,21 @@ installVirtV2V(){
 
     # General.
     apt-get -yqq install \
-            autoconf \
-            autoconf-archive \
-            automake \
-            build-essential \
-            gcc \
-            genisoimage \
-            gettext \
-            libtool \
-            make \
-            pkg-config
+        autoconf \
+        autoconf-archive \
+        automake \
+        build-essential \
+        gcc \
+        genisoimage \
+        gettext \
+        libtool \
+        make \
+        pkg-config
 
     # Required.
     apt-get -yqq install \
         libguestfs-dev \
+        libguestfs-ocaml \
         libjansson-dev \
         libnbd-ocaml-dev \
         libosinfo-1.0-dev \
