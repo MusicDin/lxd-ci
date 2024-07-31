@@ -328,9 +328,9 @@ if hasNeededAPIExtension instance_import_conversion; then
     # conversion_vm vm-u24-vmdk-zfs zfs "${IMAGE_PATH}" "yes"
 
     # Use custom volume for backups. Images for conversion will be uploaded here.
-    lxc storage create backups-pool zfs
-    lxc storage volume create backups-pool backups-vol
-    lxc config set storage.backups_volume=backups-pool/backups-vol
+    # lxc storage create backups-pool zfs
+    # lxc storage volume create backups-pool backups-vol
+    # lxc config set storage.backups_volume=backups-pool/backups-vol
 
     # conversion_vm vm-u24-vmdk-dir-bupvol dir "${IMAGE_PATH}" "yes"
     # conversion_vm vm-u24-vmdk-zfs-bupvol zfs "${IMAGE_PATH}" "yes"
@@ -389,16 +389,16 @@ if hasNeededAPIExtension instance_import_conversion; then
 
 
         # Run conversion with driver injection.
-        conversion_vm vm-centos7-qcow2-zfs-bupvol zfs "${IMAGE_PATH}" "no" "format,virtio"
+        conversion_vm vm-centos7-qcow2-zfs-bupvol dir "${IMAGE_PATH}" "no" "format,virtio"
     else
         echo "===> SKIP: The virt-v2v-in-place version ${v2vVersion} is lower then minimum required version ${minVersion}"
     fi
 
     # Cleanup.
     rm -rf "${tmpdir}"
-    lxc config unset storage.backups_volume
-    lxc storage volume delete backups-pool backups-vol
-    lxc storage delete backups-pool
+    # lxc config unset storage.backups_volume
+    # lxc storage volume delete backups-pool backups-vol
+    # lxc storage delete backups-pool
 else
     echo "===> SKIP: VM image conversion skipped. Server does not support API extenison 'instance_import_conversion'"
 fi
