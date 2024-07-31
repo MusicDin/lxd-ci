@@ -5,7 +5,7 @@ set -eu
 . ./bin/helpers
 
 install_deps jq unzip libguestfs-tools
-install_deps virt-v2v || true # virt-v2v is within libguestfs-tools package on older Ubuntu releases.
+# install_deps virt-v2v || true # virt-v2v is within libguestfs-tools package on older Ubuntu releases.
 
 # Install LXD
 install_lxd
@@ -77,6 +77,49 @@ checkDNS() {
 
     echo "===> FAIL: DNS resolution: ${instName}"
     return 1
+}
+
+installVirtV2V(){
+    version=$1
+
+    apt-get -qq update
+
+    # General.
+    apt-get -yqq install \
+            autoconf \
+            autoconf-archive \
+            automake \
+            build-essential \
+            gcc \
+            genisoimage \
+            gettext \
+            libtool \
+            make \
+            pkg-config
+
+    # Required.
+    apt-get -yqq install \
+        libjansson-dev \
+        libnbd-ocaml-dev \
+        libosinfo-1.0-dev \
+        libpcre2-dev \
+        libvirt-ocaml-dev \
+        libxml2-dev \
+        nbdkit \
+        libnbd-bin
+
+    # Clone repo.
+    git clone --depth 1 --branch "${version}" https://github.com/libguestfs/virt-v2v
+    cd virt-v2v
+
+    # Build virt-v2v.
+    git submodule update --init
+    autoreconf -i
+    ./configure
+    make
+
+    cp in-place/virt-v2v-in-place /usr/local/bin
+    virt-v2v-in-place --version
 }
 
 # conversion_vm creates a new LXD virtual machine from the image on the given path.
@@ -291,6 +334,8 @@ if hasNeededAPIExtension instance_import_conversion; then
     # conversion_vm vm-u24-vmdk-zfs-bupvol zfs "${IMAGE_PATH}" "yes"
 
     # rm "${IMAGE_PATH}"
+
+    installVirtV2V "2.4.0"
 
     # Test virtio conversion if virt-v2v-in-place meets minimum version requirements.
     # Version will be satisfied from Ubuntu 24.04 runners onwards.
