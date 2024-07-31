@@ -335,7 +335,7 @@ if hasNeededAPIExtension instance_import_conversion; then
 
     # rm "${IMAGE_PATH}"
 
-    installVirtV2V "2.4.0"
+    installVirtV2V "v2.4.0"
 
     # Test virtio conversion if virt-v2v-in-place meets minimum version requirements.
     # Version will be satisfied from Ubuntu 24.04 runners onwards.
