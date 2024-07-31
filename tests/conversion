@@ -5,7 +5,7 @@ set -eu
 . ./bin/helpers
 
 install_deps jq unzip
-install_deps virt-v2v || true # virt-v2v is within libguestfs-tools package on older Ubuntu releases.
+install_deps virt-v2v || true
 
 # Install LXD
 install_lxd
@@ -77,51 +77,6 @@ checkDNS() {
 
     echo "===> FAIL: DNS resolution: ${instName}"
     return 1
-}
-
-installVirtV2V(){
-    version=$1
-
-    apt-get -qq update
-
-    # General.
-    apt-get -yqq install \
-        autoconf \
-        autoconf-archive \
-        automake \
-        build-essential \
-        gcc \
-        genisoimage \
-        gettext \
-        libtool \
-        make \
-        pkg-config
-
-    # Required.
-    apt-get -yqq install \
-        libguestfs-dev \
-        libguestfs-ocaml \
-        libjansson-dev \
-        libnbd-ocaml-dev \
-        libosinfo-1.0-dev \
-        libpcre2-dev \
-        libvirt-ocaml-dev \
-        libxml2-dev \
-        nbdkit \
-        libnbd-bin
-
-    # Clone repo.
-    git clone --depth 1 --branch "${version}" https://github.com/libguestfs/virt-v2v
-    cd virt-v2v
-
-    # Build virt-v2v.
-    git submodule update --init
-    autoreconf -i
-    ./configure
-    make
-
-    cp in-place/virt-v2v-in-place /usr/local/bin
-    virt-v2v-in-place --version
 }
 
 # conversion_vm creates a new LXD virtual machine from the image on the given path.
@@ -238,34 +193,15 @@ conversion() {
         echo "1"
     } | $lxdMigrateCmd
 
-    lxc config device add "${instName}" config disk source=cloud-init:config
-    lxc config set "${instName}" cloud-init.user-data - << EOF
-#cloud-config
-runcmd:
-  - mount -t virtiofs config /mnt
-  - cd /mnt
-  - ./install.sh
-  - cd /
-  - umount /mnt
-  - systemctl start lxd-agent  # XXX: causes a reboot
-EOF
-
     lxc config show "${instName}" -e
 
     # Start the instance.
     echo "Starting instance ${instName}..."
     lxc start "${instName}"
 
-    lxc info "${instName}" --show-log
-
     # Wait for the instance to be ready and ensure it has global ip address.
     echo "Waiting instance ${instName} to start..."
-    waitInstanceBooted "${instName}" || true
-
-    lxc exec "${instName}" -- cat /etc/os-release || true
-    lxc exec "${instName}" -- uname -a || true
-    lxc exec "${instName}" -- ip a || true
-
+    waitInstanceBooted "${instName}"
     sleep 10
 
     # Print the instances.
@@ -291,9 +227,9 @@ EOF
 # Test container migration using conversion mode. If server does not
 # support conversion API extension, lxd-migrate must fallback to
 # migration mode and successfully transfer the rootfs.
-# lxc launch ubuntu-minimal-daily:24.04 c1
-# conversion_container "c1"
-# lxc delete -f c1
+lxc launch ubuntu-minimal-daily:24.04 c1
+conversion_container "c1"
+lxc delete -f c1
 
 # Unblock images remote.
 sed -i '/images\.lxd\.canonical\.com/d' /etc/hosts
@@ -301,19 +237,19 @@ sed -i '/images\.lxd\.canonical\.com/d' /etc/hosts
 tmpdir="$(mktemp -d)"
 
 # Create an instance and export it to get raw image.
-# lxc init images:alpine/edge vm-tmp --vm
-# lxc export vm-tmp "${tmpdir}/vm-tmp.tar.gz"
-# lxc delete vm-tmp
+lxc init images:alpine/edge vm-tmp --vm
+lxc export vm-tmp "${tmpdir}/vm-tmp.tar.gz"
+lxc delete vm-tmp
 
 # Extract raw image from exported backup.
-# tar -xzf "${tmpdir}/vm-tmp.tar.gz" -C "${tmpdir}" "backup/virtual-machine.img"
-# rm "${tmpdir}/vm-tmp.tar.gz"
+tar -xzf "${tmpdir}/vm-tmp.tar.gz" -C "${tmpdir}" "backup/virtual-machine.img"
+rm "${tmpdir}/vm-tmp.tar.gz"
 
 # Test VM migration using conversion mode. If server does not support
 # conversion API extension, lxd-migrate must fallback to migration
 # mode and successfully transfer the VM disk.
-# conversion_vm vm-alpine-raw-zfs zfs "${tmpdir}/backup/virtual-machine.img" "none"
-# rm -rf "${tmpdir}/backup"
+conversion_vm vm-alpine-raw-zfs zfs "${tmpdir}/backup/virtual-machine.img" "none"
+rm -rf "${tmpdir}/backup"
 
 # Test VM conversion using non-raw disk formats only if server supports
 # conversion API extension.
@@ -321,29 +257,29 @@ if hasNeededAPIExtension instance_import_conversion; then
     # Test QCOW2 images.
     IMAGE_PATH="${tmpdir}/image"
 
-    # lxc image export images:alpine/edge "${IMAGE_PATH}" --vm
-    # conversion_vm vm-alpine-qcow2-zfs zfs "${IMAGE_PATH}.root" "none"
+    lxc image export images:alpine/edge "${IMAGE_PATH}" --vm
+    conversion_vm vm-alpine-qcow2-zfs zfs "${IMAGE_PATH}.root" "none"
 
-    # lxc image export images:centos/9-Stream "${IMAGE_PATH}" --vm
-    # conversion_vm vm-centos9-qcow2-btrfs btrfs "${IMAGE_PATH}.root" "secureboot"
+    lxc image export images:centos/9-Stream "${IMAGE_PATH}" --vm
+    conversion_vm vm-centos9-qcow2-btrfs btrfs "${IMAGE_PATH}.root" "secureboot"
 
-    # rm "${IMAGE_PATH}" "${IMAGE_PATH}.root"
+    rm "${IMAGE_PATH}" "${IMAGE_PATH}.root"
 
     # Test VMDK image.
-    # wget -q -O "${IMAGE_PATH}" https://cloud-images.ubuntu.com/releases/24.04/release/ubuntu-24.04-server-cloudimg-amd64.vmdk
+    wget -q -O "${IMAGE_PATH}" https://cloud-images.ubuntu.com/releases/24.04/release/ubuntu-24.04-server-cloudimg-amd64.vmdk
 
-    # conversion_vm vm-u24-vmdk-dir dir "${IMAGE_PATH}" "secureboot"
-    # conversion_vm vm-u24-vmdk-zfs zfs "${IMAGE_PATH}" "secureboot"
+    conversion_vm vm-u24-vmdk-dir dir "${IMAGE_PATH}" "secureboot"
+    conversion_vm vm-u24-vmdk-zfs zfs "${IMAGE_PATH}" "secureboot"
 
     # Use custom volume for backups. Images for conversion will be uploaded here.
-    # lxc storage create backups-pool zfs
-    # lxc storage volume create backups-pool backups-vol
-    # lxc config set storage.backups_volume=backups-pool/backups-vol
+    lxc storage create backups-pool zfs
+    lxc storage volume create backups-pool backups-vol
+    lxc config set storage.backups_volume=backups-pool/backups-vol
 
-    # conversion_vm vm-u24-vmdk-dir-bupvol dir "${IMAGE_PATH}" "secureboot"
-    # conversion_vm vm-u24-vmdk-zfs-bupvol zfs "${IMAGE_PATH}" "secureboot"
+    conversion_vm vm-u24-vmdk-dir-bupvol dir "${IMAGE_PATH}" "secureboot"
+    conversion_vm vm-u24-vmdk-zfs-bupvol zfs "${IMAGE_PATH}" "secureboot"
 
-    # rm "${IMAGE_PATH}"
+    rm "${IMAGE_PATH}"
 
     # Test virtio conversion if virt-v2v-in-place is installed and meets the minimum version
     # requirements. Version will be satisfied from Ubuntu 24.04 runners onwards.
@@ -360,9 +296,9 @@ if hasNeededAPIExtension instance_import_conversion; then
 
     # Cleanup.
     rm -rf "${tmpdir}"
-    # lxc config unset storage.backups_volume
-    # lxc storage volume delete backups-pool backups-vol
-    # lxc storage delete backups-pool
+    lxc config unset storage.backups_volume
+    lxc storage volume delete backups-pool backups-vol
+    lxc storage delete backups-pool
 else
     echo "===> SKIP: VM image conversion skipped. Server does not support API extenison 'instance_import_conversion'"
 fi
