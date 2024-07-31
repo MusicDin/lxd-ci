@@ -237,7 +237,7 @@ conversion() {
     lxc config set "${instName}" cloud-init.user-data - << EOF
 #cloud-config
 runcmd:
-  - mount -t 9p config /mnt
+  - mount -t virtiofs config /mnt
   - cd /mnt
   - ./install.sh
   - cd /
