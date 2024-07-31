@@ -4,8 +4,8 @@ set -eu
 # Source helper functions.
 . ./bin/helpers
 
-install_deps jq unzip libguestfs-tools
-# install_deps virt-v2v || true # virt-v2v is within libguestfs-tools package on older Ubuntu releases.
+install_deps jq unzip
+install_deps virt-v2v || true # virt-v2v is within libguestfs-tools package on older Ubuntu releases.
 
 # Install LXD
 install_lxd
@@ -99,6 +99,7 @@ installVirtV2V(){
 
     # Required.
     apt-get -yqq install \
+        libguestfs \
         libjansson-dev \
         libnbd-ocaml-dev \
         libosinfo-1.0-dev \
@@ -335,11 +336,13 @@ if hasNeededAPIExtension instance_import_conversion; then
 
     # rm "${IMAGE_PATH}"
 
-    installVirtV2V "v2.4.0"
+    if ! command -v virt-v2v-in-place > /dev/null; then
+        installVirtV2V "v2.4.0"
+    fi
 
     # Test virtio conversion if virt-v2v-in-place meets minimum version requirements.
     # Version will be satisfied from Ubuntu 24.04 runners onwards.
-    v2vVersion=$(virt-v2v-in-place --version | grep -oP '\d+\.\d+\.\d+' || echo "0-unkown")
+    v2vVersion=$(virt-v2v-in-place --version | grep -oP '\d+\.\d+\.\d+')
     minVersion="2.3.4"
 
     if dpkg --compare-versions "${v2vVersion}" "ge" "${minVersion}"; then
