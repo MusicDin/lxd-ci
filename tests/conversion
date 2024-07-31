@@ -99,7 +99,7 @@ installVirtV2V(){
 
     # Required.
     apt-get -yqq install \
-        libguestfs-tools \
+        libguestfs-dev \
         libjansson-dev \
         libnbd-ocaml-dev \
         libosinfo-1.0-dev \
