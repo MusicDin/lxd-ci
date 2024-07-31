@@ -350,8 +350,8 @@ if hasNeededAPIExtension instance_import_conversion; then
     v2vMinVersion="2.3.4"
     if ! command -v virt-v2v-in-place > /dev/null; then
         echo "===> SKIP: The virt-v2v-in-place cannot be installed on the runner"
-    elif dpkg --compare-versions "$(virt-v2v-in-place --version | grep -oP '\d+\.\d+\.\d+')" "ge" "${v2vMinVersion}"; then
-        echo "===> SKIP: The virt-v2v-in-place version is lower then minimum required version ${v2vMinVersion}"
+    elif ! dpkg --compare-versions "$(virt-v2v-in-place --version | grep -oP '\d+\.\d+\.\d+')" "ge" "${v2vMinVersion}"; then
+        echo "===> SKIP: The virt-v2v-in-place version is lower then minimum required version"
     else
         # Run conversion with driver injection on centos7 image.
         wget -q -O "${IMAGE_PATH}" https://cloud.centos.org/centos/7/images/CentOS-7-x86_64-GenericCloud.qcow2
