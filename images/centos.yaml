@@ -311,6 +311,13 @@ actions:
 - trigger: post-unpack
   action: |-
     #!/bin/sh
+    # Make sure we have our template targets
+    touch /etc/hosts
+    touch /etc/hostname
+
+- trigger: post-unpack
+  action: |-
+    #!/bin/sh
     set -eux
 
     # Note: This will be reverted at the end of the build
