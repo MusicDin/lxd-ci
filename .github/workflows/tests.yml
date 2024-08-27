@@ -104,189 +104,10 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: ${{ fromJSON(inputs.ubuntu-releases || '["22.04", "24.04"]') }}
-        track: ${{ fromJSON(inputs.snap-track || '["latest/edge", "5.21/edge", "5.0/edge", "4.0/edge"]') }}
+        os: ${{ fromJSON(inputs.ubuntu-releases || '["24.04"]') }}
+        track: ${{ fromJSON(inputs.snap-tracks || '["latest/edge"]') }}
         test:
-          - cgroup
-          - cloud-init
-          - cluster
-          - container
-          - container-copy
-          - conversion
-          - cpu-vm
-          - devlxd-container
-          - devlxd-vm
-          - efi-vars-editor-vm
-          - lxd-installer
-          - lxd-user
-          - interception
-          - network-bridge-firewall
-          - network-ovn ovn:deb
-          - network-ovn ovn:latest/edge
-          - network-routed
-          - pylxd
-          - qemu-external-vm
-          - snapd
-          - storage-buckets
-          - storage-disks-vm
-          - storage-metadata
-          - storage-vm btrfs
-          - storage-vm ceph
-          - storage-vm dir
-          - storage-vm lvm
-          - storage-vm lvm-thin
-          - storage-vm zfs
-          - storage-volumes-vm
-          - tpm-vm
-          - vm
           - vm-migration
-          - vm-nesting
-        exclude:
-          # not compatible with 4.0/*
-          - test: cloud-init
-            track: "4.0/candidate"
-          - test: container-copy
-            track: "4.0/candidate"
-          - test: conversion
-            track: "4.0/candidate"
-          - test: cpu-vm
-            track: "4.0/candidate"
-          - test: devlxd-vm
-            track: "4.0/candidate"
-          - test: efi-vars-editor-vm
-            track: "4.0/candidate"
-          - test: lxd-installer
-            track: "4.0/candidate"
-          - test: lxd-user
-            track: "4.0/candidate"
-          - test: network-ovn ovn:deb
-            track: "4.0/candidate"
-          - test: network-ovn ovn:latest/edge
-            track: "4.0/candidate"
-          - test: qemu-external-vm
-            track: "4.0/candidate"
-          - test: storage-buckets
-            track: "4.0/candidate"
-          - test: storage-disks-vm
-            track: "4.0/candidate"
-          - test: storage-metadata
-            track: "4.0/candidate"
-          - test: storage-vm btrfs
-            track: "4.0/candidate"
-          - test: storage-vm ceph
-            track: "4.0/candidate"
-          - test: storage-vm dir
-            track: "4.0/candidate"
-          - test: storage-vm lvm
-            track: "4.0/candidate"
-          - test: storage-vm lvm-thin
-            track: "4.0/candidate"
-          - test: storage-vm zfs
-            track: "4.0/candidate"
-          - test: storage-volumes-vm
-            track: "4.0/candidate"
-          - test: tpm-vm
-            track: "4.0/candidate"
-          - test: vm-migration
-            track: "4.0/candidate"
-          - test: cloud-init
-            track: "4.0/edge"
-          - test: container-copy
-            track: "4.0/edge"
-          - test: conversion
-            track: "4.0/edge"
-          - test: cpu-vm
-            track: "4.0/edge"
-          - test: devlxd-vm
-            track: "4.0/edge"
-          - test: efi-vars-editor-vm
-            track: "4.0/edge"
-          - test: lxd-installer
-            track: "4.0/edge"
-          - test: lxd-user
-            track: "4.0/edge"
-          - test: network-ovn ovn:deb
-            track: "4.0/edge"
-          - test: network-ovn ovn:latest/edge
-            track: "4.0/edge"
-          - test: qemu-external-vm
-            track: "4.0/edge"
-          - test: storage-buckets
-            track: "4.0/edge"
-          - test: storage-disks-vm
-            track: "4.0/edge"
-          - test: storage-metadata
-            track: "4.0/edge"
-          - test: storage-vm btrfs
-            track: "4.0/edge"
-          - test: storage-vm ceph
-            track: "4.0/edge"
-          - test: storage-vm dir
-            track: "4.0/edge"
-          - test: storage-vm lvm
-            track: "4.0/edge"
-          - test: storage-vm lvm-thin
-            track: "4.0/edge"
-          - test: storage-vm zfs
-            track: "4.0/edge"
-          - test: storage-volumes-vm
-            track: "4.0/edge"
-          - test: tpm-vm
-            track: "4.0/edge"
-          - test: vm-migration
-            track: "4.0/edge"
-          # not compatible with 5.0/*
-          - test: cloud-init
-            track: "5.0/candidate"
-          - test: cloud-init
-            track: "5.0/edge"
-          - test: efi-vars-editor-vm
-            track: "5.0/candidate"
-          - test: efi-vars-editor-vm
-            track: "5.0/edge"
-          - test: lxd-installer
-            track: "5.0/candidate"
-          - test: lxd-installer
-            track: "5.0/edge"
-          - test: network-ovn ovn:latest/edge
-            track: "5.0/candidate"
-          - test: network-ovn ovn:latest/edge
-            track: "5.0/edge"
-          - test: qemu-external-vm
-            track: "5.0/candidate"
-          - test: qemu-external-vm
-            track: "5.0/edge"
-          - test: vm-migration
-            track: "5.0/candidate"
-          - test: vm-migration
-            track: "5.0/edge"
-          # not compatible with 5.21/*
-          - test: lxd-installer
-            track: "5.21/stable"
-          - test: lxd-installer
-            track: "5.21/candidate"
-          - test: lxd-installer
-            track: "5.21/edge"
-          - test: qemu-external-vm
-            track: "5.21/stable"
-          - test: qemu-external-vm
-            track: "5.21/candidate"
-          - test: qemu-external-vm
-            track: "5.21/edge"
-          # some tests are not worth testing on specific OSes
-          - os: 22.04
-            test: lxd-installer
-          - os: 22.04
-            test: qemu-external-vm
-          # skip track/os combinations that are too far appart
-          - os: 24.04
-            track: "4.0/candidate"
-          - os: 24.04
-            track: "4.0/edge"
-          - os: 24.04
-            track: "5.0/candidate"
-          - os: 24.04
-            track: "5.0/edge"
 
     steps:
       - name: Tune disk performance
@@ -305,13 +126,62 @@ jobs:
       - name: "Disable br_netfilter"
         run: |
           set -eux
-          # XXX: br_netfilter causes subtle issues by subjecting internal
-          #      bridge traffic to NAT/MASQUERADING and IP filtering. This
-          #      modules is not normally loaded on stock Ubuntu installs but it
-          #      is on GHA runners.
-          if lsmod | grep -qw ^br_netfilter; then
-            sudo modprobe -r br_netfilter
-          fi
+          # optimize ext4 FSes for performance, not reliability
+          for fs in $(findmnt --noheading --type ext4 --list --uniq | awk '{print $1}'); do
+            # nombcache and data=writeback cannot be changed on remount
+            sudo mount -o remount,noatime,barrier=0,commit=6000 "${fs}" || cat /proc/self/mountinfo
+          done
+
+          # disable dpkg from calling sync()
+          echo "force-unsafe-io" | sudo tee /etc/dpkg/dpkg.cfg.d/force-unsafe-io
+
+      - name: Reclaim some space (storage tests only)
+        if: ${{ startsWith(matrix.test, 'storage') || matrix.test == 'vm-nesting' || matrix.test == 'conversion' || matrix.test == 'vm-migration' }}
+        run: |
+          set -eux
+          df -h
+
+          sudo snap remove lxd --purge
+          # Purge older snap revisions that are disabled/superseded by newer revisions of the same snap
+          snap list --all | while read -r name _ rev _ _ notes _; do
+            [[ "${notes}" =~ disabled$ ]] && sudo snap remove "${name}" --revision "${rev}" --purge
+          done || true
+
+          # Remove leftover home directories
+          sudo rm -rf /home/linuxbrew /home/runneradmin
+
+          # Remove unneeded directories
+          sudo rm -rf /opt/google/chrome
+          sudo rm -rf /opt/hostedtoolcache/CodeQL /opt/hostedtoolcache/PyPy /opt/hostedtoolcache/Python
+          sudo rm -rf /opt/microsoft/msedge /opt/microsoft/msodbcsql* /opt/microsoft/powershell
+          sudo rm -rf /root/.sbt
+
+          # This was inspired from https://github.com/easimon/maximize-build-space
+          df -h
+          # dotnet
+          sudo rm -rf /usr/share/dotnet
+          # android
+          sudo rm -rf /usr/local/lib/android
+          # haskell
+          sudo rm -rf /opt/ghc
+          df -h
+
+      - name: Reclaim some memory (VM migration tests only)
+        if: ${{ matrix.test == 'vm-migration' }}
+        run: |
+          set -eux
+
+          free -mt
+          sudo systemctl stop dpkg-db-backup.timer e2scrub_all.timer fstrim.timer logrotate.timer man-db.timer motd-news.timer phpsessionclean.timer update-notifier-download.timer update-notifier-motd.timer
+          sudo systemctl stop iscsid.socket multipathd.socket
+          free -mt
+
+      - name: Remove docker
+        run: |
+          set -eux
+          sudo apt-get autopurge -y containerd.io docker-ce podman uidmap
+          sudo ip link delete docker0
+          sudo nft flush ruleset || sudo iptables -I DOCKER-USER -j ACCEPT
 
       - name: Checkout
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
@@ -361,7 +231,10 @@ jobs:
               EXTRA_ARGS=""
             fi
           fi
-          sudo --preserve-env=GITHUB_ACTIONS,GITHUB_STEP_SUMMARY,TEST_IMG,OVN_SOURCE ./bin/local-run "tests/${TEST_SCRIPT}" ${{ matrix.track }} ${EXTRA_ARGS:-}
+          sudo --preserve-env=PURGE_LXD,TEST_IMG,GITHUB_ACTIONS ./bin/local-run "tests/${TEST_SCRIPT}" ${{ matrix.track }} ${EXTRA_ARGS:-}
+
+      - name: Setup tmate session
+        uses: mxschmitt/action-tmate@v3
 
       # always update cache as we have our own logic of
       # cache invalidation and updates in addition to a date check
