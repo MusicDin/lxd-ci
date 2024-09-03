@@ -222,8 +222,18 @@ conversion() {
     lxc delete -f "${instName}"
 
     if [ "${poolName}" != "" ]; then
+        echo "Storage status before cleanup..."
+        lxc storage list
+        lxc storage volume list "${poolName}"
+
         lxc storage delete "${poolName}"
+
+        echo "Storage status after cleanup..."
+        lxc storage list
+        lxc storage volume list "${poolName}" || true # Expecting an error, since the pool is deleted.
     fi
+
+
 }
 
 # Test container migration using conversion mode. If server does not
