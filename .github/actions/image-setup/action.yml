@@ -31,11 +31,17 @@ runs:
             rsync \
             squashfs-tools
 
-    - name: Setup LXD Imagebuilder ${{ inputs.lxd-imagebuilder-channel }}
+    - name: Install Go ${{ inputs.go-version }}
+      uses: actions/setup-go@v5
+      with:
+        go-version: "${{ inputs.go-version }}"
+
+    - name: Build LXD imagebuilder
       shell: bash
       run: |
-        sudo snap install lxd-imagebuilder --channel=${{ inputs.lxd-imagebuilder-channel }} --classic
-        lxd-imagebuilder --version
+        git clone https://github.com/musicdin/lxd-imagebuilder --branch fix/opensuse --depth 1
+        cd lxd-imagebuilder
+        make
 
     - name: Setup LXD ${{ inputs.lxd-channel }}
       shell: bash
