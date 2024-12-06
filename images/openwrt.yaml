@@ -208,7 +208,7 @@ files:
 packages:
   # Note: Older releases of OpenWrt use "opkg" package manager.
   manager: apk
-  update: false
+  update: true
   cleanup: true
   sets:
   - packages:
