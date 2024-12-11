@@ -233,6 +233,11 @@ configure_ovn() {
 # install_lxd: install LXD from a specific channel or `latest/edge` if none is provided.
 # Optional argument: boolean which indicates whether to start the daemon. Default is true.
 install_lxd() (
+    if [ "${USE_CURRENT_LXD}" = "1" ]; then
+        echo "Using currently installed LXD"
+        return
+    fi
+
     local start_daemon="${1:-true}"
 
     # Wait for snapd seeding
