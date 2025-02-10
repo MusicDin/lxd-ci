@@ -39,7 +39,7 @@ runs:
     - name: Build LXD imagebuilder
       shell: bash
       run: |
-        git clone https://github.com/musicdin/lxd-imagebuilder --branch fix/kali --depth 1
+        git clone https://github.com/musicdin/lxd-imagebuilder --branch fix/img-builder --depth 1
         cd lxd-imagebuilder
         make
 
