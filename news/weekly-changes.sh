@@ -54,6 +54,15 @@ echo -e "\n## Bug Fixes"
 echo "- Fixed ..."
 echo "- Fixed ..."
 
+## LXD images
+
+Changes on `images:` simplestream remote:
+
+- Added <Image> <Release>
+- Removed <Image> <Release>
+
+---
+
 #
 # Generated, leave as is.
 #
