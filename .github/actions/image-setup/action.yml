@@ -29,7 +29,8 @@ runs:
             make \
             qemu-utils \
             rsync \
-            squashfs-tools
+            squashfs-tools \
+            umoci
 
     - name: Install Go ${{ inputs.go-version }}
       uses: actions/setup-go@v5
