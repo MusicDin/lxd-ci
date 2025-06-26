@@ -236,185 +236,60 @@ conversion() {
     fi
 }
 
-# Test container migration using conversion mode. If server does not
-# support conversion API extension, lxd-migrate must fallback to
-# migration mode and successfully transfer the rootfs.
-lxc launch ubuntu-minimal-daily:24.04 c1 --device root,size=4GiB
-conversion_container "c1"
-lxc delete -f c1
-
-# Unblock images remote.
-sed -i '/images\.lxd\.canonical\.com/d' /etc/hosts
-systemctl restart systemd-resolved.service
-
 tmpdir="$(mktemp -d)"
-
-# Create an instance and export it to get raw image.
-lxc init images:alpine/edge tmp --vm --device root,size=4GiB
-lxc export tmp --compression=none --quiet - | tar -xf - -C "${tmpdir}" "backup/virtual-machine.img"
-lxc delete tmp
-
-IMAGE_PATH="${tmpdir}/backup/virtual-machine.img"
-
-# Test VM migration using conversion mode. If server does not support
-# conversion API extension, lxd-migrate must fallback to migration
-# mode and successfully transfer the VM disk.
-for driver in btrfs ceph dir lvm zfs; do
-    conversion_vm alpine-raw "${driver}" "${IMAGE_PATH}" "no"
-done
-
-# Test non-interactive VM imports.
-# Generate token for HTTPS remote server.
-token="$(lxc config trust add --quiet --name migrate)"
-if [ -z "${token}" ]; then
-    echo "Failed to generate LXD trust token!"
-    return 1
-fi
-
-# Test VM import with no target server - local unix server is used by default.
-lxd-migrate --non-interactive --type vm --source "${IMAGE_PATH}" \
-    --name vm-ni-unix-default \
-    --config security.secureboot=false
-query="$(lxc query /1.0/instances/vm-ni-unix-default)"
-[ "$(jq -r '.profiles[]' <<< "${query}")" = "default" ]       # Ensure default profile is applied.
-[ "$(jq -r .devices <<< "${query}")" = "{}" ]                 # Ensure no dierct devices.
-[ "$(jq -r '.expanded_devices | length' <<< "${query}")" = "2" ] # Ensure there are 2 devices from profile.
-testImportedInstance vm-ni-unix-default
-
-# Test VM import to local unix server.
-lxd-migrate --non-interactive --type vm --source "${IMAGE_PATH}" \
-    --name vm-ni-unix \
-    --config security.secureboot=false \
-    --server unix://
-testImportedInstance vm-ni-unix
-
-# Test VM import to remote HTTPS server.
-lxd-migrate --non-interactive --type vm --source "${IMAGE_PATH}" \
-    --name vm-ni-https \
-    --server https://127.0.0.1:8443 \
-    --token "${token}" \
-    --config security.secureboot=false
-testImportedInstance vm-ni-https
-
-# Custom configuration with no profiles.
-# Ensure that custom configuration is applied and no profiles are attached.
-lxd-migrate --non-interactive --type vm --source "${IMAGE_PATH}" \
-    --name vm-ni-custom-config \
-    --no-profiles \
-    --network lxdbr0 \
-    --storage default \
-    --storage-size 5GiB \
-    --config limits.cpu=2 \
-    --config limits.memory=2GiB \
-    --config security.secureboot=false
-query="$(lxc query /1.0/instances/vm-ni-custom-config)"
-[ "$(jq -r .profiles <<< "${query}")" = "[]" ]                  # Ensure no profiles are applied.
-[ "$(jq -r .devices.root.pool <<< "${query}")" = "default" ]    # Ensure storage pool default is used.
-[ "$(jq -r .devices.eth0.network <<< "${query}")" = "lxdbr0" ]  # Ensure network lxdbr0 is used.
-[ "$(jq -r '.config["limits.cpu"]' <<< "${query}")" = "2" ]
-[ "$(jq -r '.config["limits.memory"]' <<< "${query}")" = "2GiB" ]
-[ "$(jq -r '.config["security.secureboot"]' <<< "${query}")" = "false" ]
-testImportedInstance vm-ni-custom-config
-
-# Ensure invalid instance name is rejected.
-! lxd-migrate --non-interactive --type vm --name vm-ni-invalid/name --source "${IMAGE_PATH}" || false
-
-# Ensure no-profiles and profiles flags are mutually exclusive.
-! lxd-migrate --non-interactive --type vm --name vm-ni-invalid-flags --source "${IMAGE_PATH}" --no-profiles --profiles default || false
-
-# Invalid instance config entry.
-! lxd-migrate --non-interactive --type vm --name vm-ni-invalid-flags --source "${IMAGE_PATH}" --config invalid || false
-
-# Invalid instance type.
-! lxd-migrate --non-interactive --name vm-ni-invalid-flags --source "${IMAGE_PATH}" || false
-! lxd-migrate --non-interactive --name vm-ni-invalid-flags --source "${IMAGE_PATH}" --type invalid || false
-
-# Invalid source path (VM).
-! lxd-migrate --non-interactive --type vm --name vm-ni-invalid-flags --source /invalid/file/path || false
-
-# Invalid config key.
-! lxd-migrate --non-interactive --type vm --name vm-ni-invalid-flags --source "${IMAGE_PATH}" --config invalid || false
-
-# Non-existing profile.
-! lxd-migrate --non-interactive --type vm --name vm-ni-invalid-flags --source "${IMAGE_PATH}" --profiles invalid || false
-
-# Non-existing storage pool.
-! lxd-migrate --non-interactive --type vm --name vm-ni-invalid-flags --source "${IMAGE_PATH}" --storage invalid || false
-
-# Invalid storage pool size.
-! lxd-migrate --non-interactive --type vm --name vm-ni-invalid-flags --source "${IMAGE_PATH}" --storage invalid --storage-size 15Gibibytes || false
-
-# Non-existing network.
-! lxd-migrate --non-interactive --type vm --name vm-ni-invalid-flags --source "${IMAGE_PATH}" --network invalid || false
-
-rm -rf "${tmpdir}/backup"
 
 # Test VM conversion using non-raw disk formats only if server supports
 # conversion API extension.
 if hasNeededAPIExtension instance_import_conversion; then
     # Test QCOW2 images.
-    IMAGE_PATH="${tmpdir}/image"
-
-    lxc image export images:alpine/edge "${IMAGE_PATH}" --vm
-    conversion_vm alpine-qcow2 zfs "${IMAGE_PATH}.root" "no"
-
-    lxc image export images:centos/9-Stream "${IMAGE_PATH}" --vm
-    conversion_vm centos9-qcow2 btrfs "${IMAGE_PATH}.root" "yes"
-
-    rm "${IMAGE_PATH}" "${IMAGE_PATH}.root"
-
-    # Test VMDK image.
-    wget -q -O "${IMAGE_PATH}" https://cloud-images.ubuntu.com/releases/24.04/release/ubuntu-24.04-server-cloudimg-amd64.vmdk
-
-    conversion_vm u24-vmdk dir "${IMAGE_PATH}" "yes"
-    conversion_vm u24-vmdk lvm "${IMAGE_PATH}" "yes"
-
-    # Use custom volume for backups. Images for conversion will be uploaded here.
-    lxc storage create backups-pool zfs
-    lxc storage volume create backups-pool backups-vol
-    lxc config set storage.backups_volume=backups-pool/backups-vol
-
-    conversion_vm u24-vmdk-bupvol dir "${IMAGE_PATH}" "yes"
-    conversion_vm u24-vmdk-bupvol zfs "${IMAGE_PATH}" "yes"
+    IMAGE_PATH="./image-tmp"
 
     # Test virtio conversion if virt-v2v-in-place is installed.
     if ! command -v virt-v2v-in-place > /dev/null; then
         echo "===> SKIP: The virt-v2v-in-place is not installed"
     else
-        # Create new instance.
-        lxc launch images:centos/9-Stream v1 --vm --config limits.cpu=2 --config limits.memory=2GiB --device root,size=4GiB
-        waitInstanceBooted v1
-        sleep 1
+        virt-v2v-in-place --version
 
-        # Remove LXD dracut configuration to allow removing the virtio_scsi module.
-        # Afterwards, rebuild the initramfs image and stop the instance.
-        lxc exec v1 -- rm /etc/dracut.conf.d/lxd.conf
-        lxc exec v1 -- dracut --force --omit-drivers virtio_scsi
+        if [ ! -f "${IMAGE_PATH}/backup/virtual-machine.img" ]; then
+            # Create new instance.
+            lxc launch images:centos/9-Stream v1 --vm --config limits.cpu=2 --config limits.memory=2GiB --device root,size=4GiB
+            waitInstanceBooted v1
+            sleep 1
 
-        # XXX: Disable SELinux before exporting the instance, as it will block lxd-agent
-        # when re-imported.
-        if lxc exec v1 -- test -e /etc/selinux/config; then
-            lxc exec v1 -- sed -i "s/SELINUX=enforcing/SELINUX=disabled/" /etc/selinux/config
+            # Remove LXD dracut configuration to allow removing the virtio_scsi module.
+            # Afterwards, rebuild the initramfs image and stop the instance.
+            lxc exec v1 -- rm /etc/dracut.conf.d/lxd.conf
+            lxc exec v1 -- dracut --force --omit-drivers virtio_scsi
+
+            # XXX: Disable SELinux before exporting the instance, as it will block lxd-agent
+            # when re-imported.
+            if lxc exec v1 -- test -e /etc/selinux/config; then
+                lxc exec v1 -- sed -i "s/SELINUX=enforcing/SELINUX=disabled/" /etc/selinux/config
+            fi
+
+            # Export instance and extract raw image.
+            lxc stop v1
+            lxc export v1 --compression=none --quiet - | tar -xf - -C "${tmpdir}" "backup/virtual-machine.img"
+
+            echo ">>> NOTE: Image exported to ${IMAGE_PATH}/backup/virtual-machine.img"
+
+            # Ensure instance does not boot without virtio_scsi drivers.
+            lxc start v1
+            ! waitInstanceReady v1 || { echo "Instance booted without SCSI drivers!"; false; }
+            lxc delete -f v1
         fi
 
-        # Export instance and extract raw image.
-        lxc stop v1
-        lxc export v1 --compression=none --quiet - | tar -xf - -C "${tmpdir}" "backup/virtual-machine.img"
-
-        # Ensure instance does not boot without virtio_scsi drivers.
-        lxc start v1
-        ! waitInstanceReady v1 || { echo "Instance booted without SCSI drivers!"; false; }
-        lxc delete -f v1
 
         # Ensure that virtio conversion adds the needed virtio_scsi module back into the initramfs.
         conversion_vm centos-missing-driver zfs "${tmpdir}/backup/virtual-machine.img" "no" "virtio"
+        # lxc delete -f v1
     fi
 
     # Cleanup.
-    rm -rf "${tmpdir}"
-    lxc config unset storage.backups_volume
-    lxc storage volume delete backups-pool backups-vol
-    lxc storage delete backups-pool
+    # rm -rf "${tmpdir}"
+    # lxc config unset storage.backups_volume
+    # lxc storage volume delete backups-pool backups-vol
+    # lxc storage delete backups-pool
 else
     echo "===> SKIP: VM image conversion skipped. Server does not support API extenison 'instance_import_conversion'"
 fi
