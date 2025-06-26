@@ -225,42 +225,40 @@ if hasNeededAPIExtension instance_import_conversion; then
     else
         virt-v2v-in-place --version
 
-        if [ ! -f "${IMAGE_PATH}/backup/virtual-machine.img" ]; then
-            # Create new instance.
-            lxc launch images:centos/9-Stream v1 --vm --config limits.cpu=2 --config limits.memory=2GiB
-            waitInstanceBooted v1
-            sleep 1
+        # Create new instance.
+        lxc launch images:centos/9-Stream v1 --vm --config limits.cpu=2 --config limits.memory=2GiB
+        waitInstanceBooted v1
+        sleep 1
 
-            # Remove LXD dracut configuration to allow removing the virtio_scsi module.
-            # Afterwards, rebuild the initramfs image and stop the instance.
-            lxc exec v1 -- rm /etc/dracut.conf.d/lxd.conf
-            lxc exec v1 -- dracut --force --omit-drivers virtio_scsi
+        # Remove LXD dracut configuration to allow removing the virtio_scsi module.
+        # Afterwards, rebuild the initramfs image and stop the instance.
+        lxc exec v1 -- rm /etc/dracut.conf.d/lxd.conf
+        lxc exec v1 -- dracut --force --omit-drivers virtio_scsi
 
-            # XXX: Disable SELinux before exporting the instance, as it will block lxd-agent
-            # when re-imported.
-            if lxc exec v1 -- test -e /etc/selinux/config; then
-                lxc exec v1 -- sed -i "s/SELINUX=enforcing/SELINUX=disabled/" /etc/selinux/config
-            fi
-
-            # Export instance and extract raw image.
-            lxc stop v1
-            lxc export v1 --compression=none --quiet - | tar -xf - -C "${tmpdir}" "backup/virtual-machine.img"
-
-            echo ">>> NOTE: Image exported to ${IMAGE_PATH}/backup/virtual-machine.img"
-
-            # Ensure instance does not boot without virtio_scsi drivers.
-            lxc start v1
-            ! waitInstanceReady v1 || { echo "Instance booted without SCSI drivers!"; false; }
-            lxc delete -f v1
+        # XXX: Disable SELinux before exporting the instance, as it will block lxd-agent
+        # when re-imported.
+        if lxc exec v1 -- test -e /etc/selinux/config; then
+            lxc exec v1 -- sed -i "s/SELINUX=enforcing/SELINUX=disabled/" /etc/selinux/config
         fi
 
+        # Export instance and extract raw image.
+        lxc stop v1
+        lxc export v1 --compression=none --quiet - | tar -xf - -C "${tmpdir}" "backup/virtual-machine.img"
+
+        echo ">>> NOTE: Image exported to ${IMAGE_PATH}/backup/virtual-machine.img"
+
+        # Ensure instance does not boot without virtio_scsi drivers.
+        lxc start v1
+        ! waitInstanceReady v1 || { echo "Instance booted without SCSI drivers!"; false; }
+        lxc delete -f v1
+
         echo "==> CONVERT: Manual conversion"
-        virt-v2v-in-place -x -v -i disk -if raw --block-driver virtio-scsi "${IMAGE_PATH}/backup/virtual-machine.img"
+        virt-v2v-in-place -x -v -i disk -if raw --block-driver virtio-scsi "${tmpdir}/backup/virtual-machine.img"
 
 
         echo "==> CONVERT: LXD conversion"
         # Ensure that virtio conversion adds the needed virtio_scsi module back into the initramfs.
-        conversion_vm centos-missing-driver zfs "${IMAGE_PATH}/backup/virtual-machine.img" "no" "virtio"
+        conversion_vm centos-missing-driver zfs "${tmpdir}/backup/virtual-machine.img" "no" "virtio"
         # lxc delete -f v1
     fi
 
