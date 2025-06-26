@@ -282,7 +282,7 @@ if hasNeededAPIExtension instance_import_conversion; then
         lxc delete -f v1
 
         echo "==> CONVERT: Manual conversion"
-        virt-v2v-in-place -x -v -i disk -if raw --block-driver virtio-scsi "${tmpdir}/backup/virtual-machine.img"
+        sudo virt-v2v-in-place -x -v -i disk -if raw --block-driver virtio-scsi "${tmpdir}/backup/virtual-machine.img"
 
 
         echo "==> CONVERT: LXD conversion"
