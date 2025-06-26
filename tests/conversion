@@ -5,39 +5,10 @@ set -eu
 # shellcheck disable=SC1091
 . ./bin/helpers
 
-# XXX: virt-v2v is recent enough in 24.04 onward. For older releases,
-# virt-v2v is not installed, and the conversion test is skipped.
-# shellcheck disable=SC1091
-. /etc/os-release
-if dpkg --compare-versions "${VERSION_ID}" ge 24.04; then
-      install_deps jq unzip virt-v2v
-else
-      install_deps jq unzip
-fi
-
-# Install LXD
-install_lxd
-
-set -x
-
-if ! command -v go; then
-    # Install go from Snap.
-    snap install go --classic
-fi
-
-export PATH="${HOME}/go/bin:${PATH}"
-
 # Install latest lxd-migrate binary tool.
 CGO_ENABLED=0 go install github.com/canonical/lxd/lxd-migrate@latest
 # Make it smaller
-strip --strip-all "$(command -v lxd-migrate)"
-
-# Configure LXD
-lxd init --auto --network-address "[::]" --network-port "8443"
-
-# Unblock images remote.
-sed -i '/images\.lxd\.canonical\.com/d' /etc/hosts
-systemctl restart systemd-resolved.service
+# strip --strip-all "$(command -v lxd-migrate)"
 
 checkIPAddresses() {
     instName=$1
@@ -256,7 +227,7 @@ if hasNeededAPIExtension instance_import_conversion; then
 
         if [ ! -f "${IMAGE_PATH}/backup/virtual-machine.img" ]; then
             # Create new instance.
-            lxc launch images:centos/9-Stream v1 --vm --config limits.cpu=2 --config limits.memory=2GiB --device root,size=4GiB
+            lxc launch images:centos/9-Stream v1 --vm --config limits.cpu=2 --config limits.memory=2GiB
             waitInstanceBooted v1
             sleep 1
 
