@@ -35,6 +35,10 @@ strip --strip-all "$(command -v lxd-migrate)"
 # Configure LXD
 lxd init --auto --network-address "[::]" --network-port "8443"
 
+# Unblock images remote.
+sed -i '/images\.lxd\.canonical\.com/d' /etc/hosts
+systemctl restart systemd-resolved.service
+
 checkIPAddresses() {
     instName=$1
 
