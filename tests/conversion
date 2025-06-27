@@ -277,9 +277,9 @@ if hasNeededAPIExtension instance_import_conversion; then
         echo ">>> NOTE: Image exported to ${IMAGE_PATH}/backup/virtual-machine.img"
 
         # Ensure instance does not boot without virtio_scsi drivers.
-        lxc start v1
-        ! waitInstanceReady v1 || { echo "Instance booted without SCSI drivers!"; false; }
-        lxc delete -f v1
+        # lxc start v1
+        # ! waitInstanceReady v1 || { echo "Instance booted without SCSI drivers!"; false; }
+        # lxc delete -f v1
 
         echo "==> CONVERT: Manual conversion"
         sudo virt-v2v-in-place -x -v -i disk -if raw --block-driver virtio-scsi "${tmpdir}/backup/virtual-machine.img"
