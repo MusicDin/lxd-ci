@@ -284,18 +284,18 @@ jobs:
         #     track: "5.0/edge"
 
     steps:
-      - name: Tune disk performance
-        uses: canonical/lxd/.github/actions/tune-disk-performance@main
+      # - name: Tune disk performance
+      #   uses: canonical/lxd/.github/actions/tune-disk-performance@main
 
-      - name: Reclaim some memory
-        uses: canonical/lxd/.github/actions/reclaim-memory@main
+      # - name: Reclaim some memory
+      #   uses: canonical/lxd/.github/actions/reclaim-memory@main
 
-      - name: Reclaim disk space
-        if: ${{ matrix.test == 'conversion' || startsWith(matrix.test, 'storage-') || matrix.test == 'vm-nesting' }}
-        uses: canonical/lxd/.github/actions/reclaim-disk-space@main
+      # - name: Reclaim disk space
+      #   if: ${{ matrix.test == 'conversion' || startsWith(matrix.test, 'storage-') || matrix.test == 'vm-nesting' }}
+      #   uses: canonical/lxd/.github/actions/reclaim-disk-space@main
 
-      - name: Disable Docker
-        uses: canonical/lxd/.github/actions/disable-docker@main
+      # - name: Disable Docker
+      #   uses: canonical/lxd/.github/actions/disable-docker@main
 
       - name: "Disable br_netfilter"
         run: |
