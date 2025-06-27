@@ -247,6 +247,7 @@ tmpdir="$(mktemp -d)"
 if hasNeededAPIExtension instance_import_conversion; then
     # Test QCOW2 images.
     IMAGE_PATH="./image-tmp"
+    mkdir -p "${IMAGE_PATH}"
 
     # Test virtio conversion if virt-v2v-in-place is installed.
     if ! command -v virt-v2v-in-place > /dev/null; then
