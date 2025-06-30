@@ -280,6 +280,7 @@ if hasNeededAPIExtension instance_import_conversion; then
 
         lxc launch ubuntu:24.04 v2v \
             --config security.privileged=true \
+            --config security.nesting=true \
             --config limits.memory=4GiB \
             --config limits.cpu=4
 
