@@ -277,20 +277,38 @@ if hasNeededAPIExtension instance_import_conversion; then
 
         echo ">>> NOTE: Image exported to ${IMAGE_PATH}/backup/virtual-machine.img"
 
+
+        lxc launch ubuntu:24.04 v2v \
+            --config security.privileged=true \
+            --config limits.memory=4GiB \
+            --config limits.cpu=4
+
+
+        waitInstanceBooted v2v
+
+        lxc exec v2v -- sudo apt-get update
+        lxc exec v2v -- sudo apt-get install -y virt-v2v
+        lxc push --create-dirs --mode 0755 "${IMAGE_PATH}/backup/virtual-machine.img" v2v/root/virtual-machine.img
+        lxc exec v2v -- virt-v2v-in-place -x -v -i disk -if raw --block-driver virtio-scsi virtual-machine.img
+
+
+
+
+
         # Ensure instance does not boot without virtio_scsi drivers.
         # lxc start v1
         # ! waitInstanceReady v1 || { echo "Instance booted without SCSI drivers!"; false; }
         # lxc delete -f v1
 
-        chmod -R 777 "${IMAGE_PATH}"
+        # chmod -R 777 "${IMAGE_PATH}"
 
-        echo "==> CONVERT: Manual conversion"
-        sudo virt-v2v-in-place -x -v -i disk -if raw --block-driver virtio-scsi "${IMAGE_PATH}/backup/virtual-machine.img"
+        # echo "==> CONVERT: Manual conversion"
+        # sudo virt-v2v-in-place -x -v -i disk -if raw --block-driver virtio-scsi "${IMAGE_PATH}/backup/virtual-machine.img"
 
 
-        echo "==> CONVERT: LXD conversion"
+        # echo "==> CONVERT: LXD conversion"
         # Ensure that virtio conversion adds the needed virtio_scsi module back into the initramfs.
-        conversion_vm centos-missing-driver zfs "${IMAGE_PATH}/backup/virtual-machine.img" "no" "virtio"
+        # conversion_vm centos-missing-driver zfs "${IMAGE_PATH}/backup/virtual-machine.img" "no" "virtio"
         # lxc delete -f v1
     fi
 
