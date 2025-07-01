@@ -17,7 +17,7 @@ networkName="lxdbr42"
 poolName="ctpool"
 poolDriver=zfs
 
-if [ "$1" = "cleanup" ]; then
+if [ "${1:-}" = "cleanup" ]; then
   lxc delete -f ceph || true
   lxc delete -f member1 || true
   lxc delete -f member2 || true
