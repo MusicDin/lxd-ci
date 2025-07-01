@@ -1,27 +1,47 @@
 #!/bin/bash
 set -eux
 
+# source bin/helpers
+
 # Install dependencies
 install_deps jq
 
 # Install LXD
 install_lxd
 
-# Configure LXD
-lxc network create lxdbr0
-lxc profile device add default eth0 nic network=lxdbr0
 
-poolName="ctpool$$"
+
+LXD_SNAP_CHANNEL="${LXD_SNAP_CHANNEL:-latest/edge}"
+
+poolName="ctpool"
 poolDriver=zfs
 
+if [ "$1" = "cleanup" ]; then
+  lxc delete -f ceph || true
+  lxc delete -f member1 || true
+  lxc delete -f member2 || true
+  lxc profile delete kvm || true
+
+  for vol in $(lxc storage volume list "${poolName}" -f csv -c n || true); do
+    if [ ${#vol} -eq 64 ]; then
+      continue # Skip images.
+    fi
+    lxc storage volume delete "${poolName}" "${vol}"
+  done
+fi
+
+# Configure LXD.
+lxc network create lxdbr42
+lxc profile device add default eth0 nic network=lxdbr42
+
 echo "==> Create storage pool using driver ${poolDriver}"
-lxc storage create "${poolName}" "${poolDriver}"
+lxc storage create "${poolName}" "${poolDriver}" || true
 lxc profile device add default root disk path="/" pool="${poolName}"
 
 LOCAL_LOOP_DEVICE=""
 cleanup() {
   if [ -n "${LOCAL_LOOP_DEVICE:-}" ]; then
-    losetup --detach "${LOCAL_LOOP_DEVICE}"  
+    losetup --detach "${LOCAL_LOOP_DEVICE}"
   fi
 }
 
@@ -88,32 +108,39 @@ for _ in $(seq 60); do
   fi
 done
 
-cat << EOF | lxc profile create kvm
-config:
-  limits.cpu: 4
-  limits.memory: 4GiB
-  linux.kernel_modules: kvm,vhost_net,vhost_vsock,rbd
-  security.devlxd.images: "true"
-  security.idmap.isolated: "false"
-  security.nesting: "true"
-devices:
-  kvm:
-    source: /dev/kvm
-    type: unix-char
-  vhost-net:
-    source: /dev/vhost-net
-    type: unix-char
-  vhost-vsock:
-    source: /dev/vhost-vsock
-    type: unix-char
-  vsock:
-    mode: "0666"
-    source: /dev/vsock
-    type: unix-char
-EOF
+# cat << EOF | lxc profile create kvm
+# config:
+#   limits.cpu: 4
+#   limits.memory: 4GiB
+#   linux.kernel_modules: kvm,vhost_net,vhost_vsock,rbd
+#   security.devlxd.images: "true"
+#   security.idmap.isolated: "false"
+#   security.nesting: "true"
+#   security.privileged: "true"
+#   #raw.apparmor: "mount,"
+#   raw.lxc: |
+#     #lxc.apparmor.profile = unconfined
+#     lxc.mount.auto=proc:rw sys:rw cgroup:rw
+#     lxc.cgroup.devices.allow=a
+#     lxc.cap.drop=
+# devices:
+#   kvm:
+#     source: /dev/kvm
+#     type: unix-char
+#   vhost-net:
+#     source: /dev/vhost-net
+#     type: unix-char
+#   vhost-vsock:
+#     source: /dev/vhost-vsock
+#     type: unix-char
+#   vsock:
+#     mode: "0666"
+#     source: /dev/vsock
+#     type: unix-char
+# EOF
 
-lxc init "${TEST_IMG:-ubuntu-minimal-daily:24.04}" member1 --profile default --profile kvm
-lxc init "${TEST_IMG:-ubuntu-minimal-daily:24.04}" member2 --profile default --profile kvm
+lxc init "${TEST_IMG:-ubuntu-minimal-daily:24.04}" member1 --profile default kvm --storage "${poolName}" --vm
+lxc init "${TEST_IMG:-ubuntu-minimal-daily:24.04}" member2 --profile default kvm --storage "${poolName}" --vm
 
 # Start the instances and wait for member1 to be ready.
 lxc start member1
@@ -198,7 +225,7 @@ lxc exec member1 -- lxc init "${TEST_IMG:-ubuntu-minimal-daily:24.04}" v1 --vm -
 # Add vol1 as a disk device to the VM.
 lxc exec member1 -- lxc config device add v1 vol1-disk disk pool=ceph source=vol1
 
- Start the VM.
+# Start the VM.
 lxc exec member1 -- lxc start v1
 
 # Wait for a long time for it to boot (doubly nested VM takes a while).
