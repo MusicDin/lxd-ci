@@ -1,7 +1,7 @@
 #!/bin/bash
 set -eux
 
-# source bin/helpers
+source $(dirname $0)/../bin/helpers
 
 # Install dependencies
 install_deps jq
@@ -13,6 +13,7 @@ install_lxd
 
 LXD_SNAP_CHANNEL="${LXD_SNAP_CHANNEL:-latest/edge}"
 
+networkName="lxdbr42"
 poolName="ctpool"
 poolDriver=zfs
 
@@ -28,15 +29,14 @@ if [ "$1" = "cleanup" ]; then
     fi
     lxc storage volume delete "${poolName}" "${vol}"
   done
+  lxc storage delete "${poolName}" || true
+  lxc network delete "${networkName}" || true
 fi
 
 # Configure LXD.
-lxc network create lxdbr42
-lxc profile device add default eth0 nic network=lxdbr42
-
+lxc network create "${networkName}"
 echo "==> Create storage pool using driver ${poolDriver}"
-lxc storage create "${poolName}" "${poolDriver}" || true
-lxc profile device add default root disk path="/" pool="${poolName}"
+lxc storage create "${poolName}" "${poolDriver}"
 
 LOCAL_LOOP_DEVICE=""
 cleanup() {
@@ -48,7 +48,7 @@ cleanup() {
 trap cleanup EXIT HUP INT TERM
 
 # Create ceph node
-lxc init "${TEST_IMG:-ubuntu-minimal-daily:24.04}" ceph --vm -c limits.cpu=4 -c limits.memory=4GiB
+lxc init "${TEST_IMG:-ubuntu-minimal-daily:24.04}" ceph --vm -c limits.cpu=4 -c limits.memory=4GiB --network "${networkName}" --storage "${poolName}"
 if [ -n "${GITHUB_ACTIONS:-}" ]; then
   # If the rootfs and the ephemeral part are on the same physical disk, giving the whole
   # disk to microceph would wipe our rootfs. Since it is pretty rare for GitHub Action
@@ -108,39 +108,39 @@ for _ in $(seq 60); do
   fi
 done
 
-# cat << EOF | lxc profile create kvm
-# config:
-#   limits.cpu: 4
-#   limits.memory: 4GiB
-#   linux.kernel_modules: kvm,vhost_net,vhost_vsock,rbd
-#   security.devlxd.images: "true"
-#   security.idmap.isolated: "false"
-#   security.nesting: "true"
-#   security.privileged: "true"
-#   #raw.apparmor: "mount,"
-#   raw.lxc: |
-#     #lxc.apparmor.profile = unconfined
-#     lxc.mount.auto=proc:rw sys:rw cgroup:rw
-#     lxc.cgroup.devices.allow=a
-#     lxc.cap.drop=
-# devices:
-#   kvm:
-#     source: /dev/kvm
-#     type: unix-char
-#   vhost-net:
-#     source: /dev/vhost-net
-#     type: unix-char
-#   vhost-vsock:
-#     source: /dev/vhost-vsock
-#     type: unix-char
-#   vsock:
-#     mode: "0666"
-#     source: /dev/vsock
-#     type: unix-char
-# EOF
+cat << EOF | lxc profile create kvm
+config:
+  limits.cpu: 4
+  limits.memory: 4GiB
+  linux.kernel_modules: kvm,vhost_net,vhost_vsock,rbd
+  security.devlxd.images: "true"
+  security.idmap.isolated: "false"
+  security.nesting: "true"
+  security.privileged: "true"
+  #raw.apparmor: "mount,"
+  raw.lxc: |
+    #lxc.apparmor.profile = unconfined
+    lxc.mount.auto=proc:rw sys:rw cgroup:rw
+    lxc.cgroup.devices.allow=a
+    lxc.cap.drop=
+devices:
+  kvm:
+    source: /dev/kvm
+    type: unix-char
+  vhost-net:
+    source: /dev/vhost-net
+    type: unix-char
+  vhost-vsock:
+    source: /dev/vhost-vsock
+    type: unix-char
+  vsock:
+    mode: "0666"
+    source: /dev/vsock
+    type: unix-char
+EOF
 
-lxc init "${TEST_IMG:-ubuntu-minimal-daily:24.04}" member1 --profile default kvm --storage "${poolName}" --vm
-lxc init "${TEST_IMG:-ubuntu-minimal-daily:24.04}" member2 --profile default kvm --storage "${poolName}" --vm
+lxc init "${TEST_IMG:-ubuntu-minimal-daily:24.04}" member1 --network "${networkName}" --storage "${poolName}" --vm # --profile kvm
+lxc init "${TEST_IMG:-ubuntu-minimal-daily:24.04}" member2 --network "${networkName}" --storage "${poolName}" --vm # --profile kvm
 
 # Start the instances and wait for member1 to be ready.
 lxc start member1
