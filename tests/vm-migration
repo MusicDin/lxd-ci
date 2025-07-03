@@ -4,11 +4,11 @@ set -eux
 
 # source "$(dirname $0)/../bin/helpers"
 
-# # Install dependencies
-# install_deps jq
+# Install dependencies
+install_deps jq
 
-# # Install LXD
-# install_lxd
+# Install LXD
+install_lxd
 
 # Unblock images remote.
 sed -i '/images\.lxd\.canonical\.com/d' /etc/hosts
@@ -242,6 +242,7 @@ for i in $(seq 1 60); do
 done
 
 # vol1 should be available as /dev/sdb. Format it as ext4. Then mount it and create a file.
+lxc exec member1 -- lxc exec v1 -- apk add e2fsprogs
 lxc exec member1 -- lxc exec v1 -- mkfs.ext4 /dev/sdb
 lxc exec member1 -- lxc exec v1 -- mkdir /mnt/vol1
 lxc exec member1 -- lxc exec v1 -- mount -t ext4 /dev/sdb /mnt/vol1
