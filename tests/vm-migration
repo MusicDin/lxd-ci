@@ -2,16 +2,16 @@
 
 set -eux
 
-source "$(dirname $0)/../bin/helpers"
+# source "$(dirname $0)/../bin/helpers"
 
 # Install dependencies
-# install_deps jq
+install_deps jq
 
 # Install LXD
-# install_lxd
+install_lxd
 
 # Unblock images remote.
-# sed -i '/images\.lxd\.canonical\.com/d' /etc/hosts
+sed -i '/images\.lxd\.canonical\.com/d' /etc/hosts
 
 LXD_SNAP_CHANNEL="${LXD_SNAP_CHANNEL:-latest/edge}"
 
