@@ -2,16 +2,16 @@
 
 set -eux
 
-# source "$(dirname $0)/../bin/helpers"
+source "$(dirname $0)/../bin/helpers"
 
 # Install dependencies
-install_deps jq
+# install_deps jq
 
 # Install LXD
-install_lxd
+# install_lxd
 
 # Unblock images remote.
-sed -i '/images\.lxd\.canonical\.com/d' /etc/hosts
+# sed -i '/images\.lxd\.canonical\.com/d' /etc/hosts
 
 LXD_SNAP_CHANNEL="${LXD_SNAP_CHANNEL:-latest/edge}"
 
@@ -226,6 +226,8 @@ lxc exec member1 -- lxc init images:alpine/edge v1 --vm --config security.secure
 
 # Add vol1 as a disk device to the VM.
 lxc exec member1 -- lxc config device add v1 vol1-disk disk pool=ceph source=vol1
+
+exit 1
 
 # Start the VM.
 lxc exec member1 -- lxc start v1
