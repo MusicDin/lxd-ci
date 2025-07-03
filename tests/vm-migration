@@ -1,7 +1,7 @@
 #!/bin/bash
 set -eux
 
-source $(dirname $0)/../bin/helpers
+# source $(dirname $0)/../bin/helpers
 
 # Install dependencies
 install_deps jq
@@ -9,7 +9,8 @@ install_deps jq
 # Install LXD
 install_lxd
 
-
+# Unblock images remote.
+sed -i '/images\.lxd\.canonical\.com/d' /etc/hosts
 
 LXD_SNAP_CHANNEL="${LXD_SNAP_CHANNEL:-latest/edge}"
 
@@ -139,8 +140,8 @@ devices:
     type: unix-char
 EOF
 
-lxc init "${TEST_IMG:-ubuntu-minimal-daily:24.04}" member1 --network "${networkName}" --storage "${poolName}" --vm # --profile kvm
-lxc init "${TEST_IMG:-ubuntu-minimal-daily:24.04}" member2 --network "${networkName}" --storage "${poolName}" --vm # --profile kvm
+lxc init ubuntu-minimal:24.04 member1 --network "${networkName}" --storage "${poolName}" --vm --config limits.cpu=4 --config limits.memory=4GiB #--profile kvm
+lxc init ubuntu-minimal:24.04 member2 --network "${networkName}" --storage "${poolName}" --vm --config limits.cpu=4 --config limits.memory=4GiB # --profile kvm
 
 # Start the instances and wait for member1 to be ready.
 lxc start member1
@@ -220,7 +221,7 @@ lxc exec member1 -- lxc storage create ceph ceph
 lxc exec member1 -- lxc storage volume create ceph vol1 --type=block size=500MiB
 
 # Create a VM in the cluster, on member1.
-lxc exec member1 -- lxc init "${TEST_IMG:-ubuntu-minimal-daily:24.04}" v1 --vm --storage ceph --target member1 -c migration.stateful=true -c limits.memory=2GiB
+lxc exec member1 -- lxc init images:alpine/edge v1 --vm --config security.secureboot=false --storage ceph --target member1 -c migration.stateful=true -c limits.cpu=2 -c limits.memory=2GiB
 
 # Add vol1 as a disk device to the VM.
 lxc exec member1 -- lxc config device add v1 vol1-disk disk pool=ceph source=vol1
