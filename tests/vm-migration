@@ -1,16 +1,17 @@
 #!/bin/bash
+
 set -eux
 
-# source $(dirname $0)/../bin/helpers
+source "$(dirname $0)/../bin/helpers"
 
-# Install dependencies
-install_deps jq
+# # Install dependencies
+# install_deps jq
 
-# Install LXD
-install_lxd
+# # Install LXD
+# install_lxd
 
 # Unblock images remote.
-sed -i '/images\.lxd\.canonical\.com/d' /etc/hosts
+# sed -i '/images\.lxd\.canonical\.com/d' /etc/hosts
 
 LXD_SNAP_CHANNEL="${LXD_SNAP_CHANNEL:-latest/edge}"
 
@@ -230,10 +231,18 @@ lxc exec member1 -- lxc config device add v1 vol1-disk disk pool=ceph source=vol
 lxc exec member1 -- lxc start v1
 
 # Wait for a long time for it to boot (doubly nested VM takes a while).
-lxc exec member1 -- sh -c 'while [ "$(lxc info v1 | awk '"'"'{if ($1 == "Processes:" print $2)}'"'"')" -le 1 ]; do echo "Waiting for instance to boot (retry 30s)" && sleep 30; done'
+
+for i in $(seq 1 60); do
+  if lxc exec member1 -- lxc info v1 | grep "Processes:" | awk '{print $2}' | awk '{ if ($1 <= 1) exit 1}'; then
+    break
+  fi
+
+  echo "Waiting for instance v1 on member1 to boot (retry $i/60)"
+  sleep 5
+done
 
 # vol1 should be available as /dev/sdb. Format it as ext4. Then mount it and create a file.
-lxc exec member1 -- lxc exec v1 -- mkfs -t ext4 /dev/sdb
+lxc exec member1 -- lxc exec v1 -- mkfs.ext4 /dev/sdb
 lxc exec member1 -- lxc exec v1 -- mkdir /mnt/vol1
 lxc exec member1 -- lxc exec v1 -- mount -t ext4 /dev/sdb /mnt/vol1
 lxc exec member1 -- lxc exec v1 -- cp /etc/hostname /mnt/vol1/bar
@@ -242,7 +251,14 @@ lxc exec member1 -- lxc exec v1 -- cp /etc/hostname /mnt/vol1/bar
 lxc exec member1 -- lxc move v1 --target member2
 
 # The VM is slow. So the agent isn't immediately available after the live migration.
-lxc exec member2 -- sh -c 'while [ "$(lxc info v1 | awk '"'"'{if ($1 == "Processes:" print $2)}'"'"')" -le 1 ]; do echo "Waiting for instance to boot (retry 5s)" && sleep 5; done'
+for i in $(seq 1 60); do
+  if lxc exec member2 -- lxc info v1 | grep "Processes:" | awk '{print $2}' | awk '{ if ($1 <= 1) exit 1}'; then
+    break
+  fi
+
+  echo "Waiting for instance v1 on member2 to boot (retry $i/60)"
+  sleep 5
+done
 
 # The volume should be functional, still mounted, and the file we created should still be there with the same contents.
 [ "$(lxc exec member2 -- lxc exec v1 -- cat /mnt/vol1/bar)" = "v1" ]
