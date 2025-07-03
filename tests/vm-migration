@@ -140,8 +140,8 @@ devices:
     type: unix-char
 EOF
 
-lxc init ubuntu-minimal:24.04 member1 --network "${networkName}" --storage "${poolName}" --vm --config limits.cpu=4 --config limits.memory=4GiB #--profile kvm
-lxc init ubuntu-minimal:24.04 member2 --network "${networkName}" --storage "${poolName}" --vm --config limits.cpu=4 --config limits.memory=4GiB # --profile kvm
+lxc init ubuntu-minimal:24.04 member1 --network "${networkName}" --storage "${poolName}" --vm --config limits.cpu=4 --config limits.memory=8GiB #--profile kvm
+lxc init ubuntu-minimal:24.04 member2 --network "${networkName}" --storage "${poolName}" --vm --config limits.cpu=4 --config limits.memory=8GiB # --profile kvm
 
 # Start the instances and wait for member1 to be ready.
 lxc start member1
@@ -166,7 +166,7 @@ fi
 
 # Initialise and configure LXD in the first member.
 lxc exec member1 -- lxd init --auto
-member1Address="$(lxc query /1.0/instances/member1?recursion=2 | jq -r ".state.network.eth0.addresses[0].address")"
+member1Address="$(lxc query /1.0/instances/member1?recursion=2 | jq -r ".state.network.enp5s0.addresses[0].address")"
 lxc exec member1 -- lxc config set core.https_address="${member1Address}:8443"
 lxc exec member1 -- lxc cluster enable member1
 joinToken="$(lxc exec member1 -- lxc cluster add member2 --quiet)"
@@ -191,7 +191,7 @@ if [ -n "${LXD_AGENT_SIDELOAD_PATH:-}" ]; then
 fi
 
 # Create a preseed file for member2 to join member1.
-member2Address="$(lxc query /1.0/instances/member2?recursion=2 | jq -r ".state.network.eth0.addresses[0].address")"
+member2Address="$(lxc query /1.0/instances/member2?recursion=2 | jq -r ".state.network.enp5s0.addresses[0].address")"
 preseed="$(
   cat <<EOF
 cluster:
