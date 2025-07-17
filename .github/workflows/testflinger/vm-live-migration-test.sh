@@ -3,23 +3,11 @@ set -eux
 
 source ./vm-live-migration-helpers.sh
 
-# Install dependencies
-install_deps jq
-
-# Install MicroCeph
-install_microceph
-
 # Disk for use by MicroCeph
 backing_file="$(mktemp)"
 truncate -s 20GiB "${backing_file}"
 CEPH_DISK="$(losetup --direct-io=on --show --find "${backing_file}")"
 export CEPH_DISK
-
-# Configure MicroCeph
-configure_microceph
-
-# Install LXD
-install_lxd
 
 # Configure LXD
 lxc network create lxdbr0
