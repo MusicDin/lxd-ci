@@ -1,0 +1,40 @@
+job_queue: $JOB_QUEUE
+global_timeout: 3600
+output_timeout: 1800
+provision_data:
+  distro: $DISTRO
+
+test_data:
+  test_cmds: |
+    #!/bin/bash
+
+    set -xeuo pipefail
+
+    # This is used, along with DEVICE_IP, by all scriptlets to access the device
+    export DEVICE_USER="ubuntu"
+
+    # retrieve the tools installer
+    curl -Ls -o install_tools.sh https://raw.githubusercontent.com/canonical/hwcert-jenkins-tools/main/install_tools.sh
+
+    # install the scriptlets and other tools on the agent and the device, as necessary
+    export TOOLS_PATH=tools
+    source install_tools.sh $TOOLS_PATH
+
+    # ensure device is available before continuing
+    wait_for_ssh --allow-degraded
+
+    # Wait for snapd to become available
+    retry -- _run "timeout 5 sudo snap wait system seed.loaded"
+    wait_for_snap_changes
+
+    _run install_packages
+
+    # LXD working
+    _run sudo snap install lxd --channel=$SNAP_CHANNEL --no-wait
+    wait_for_snap_changes
+
+    _run sudo lxd init --auto
+    _run sudo usermod -G lxd ubuntu
+
+    _run sudo snap install microceph --channel="${MICROCEPH_SNAP_CHANNEL:-latest/edge}" --cohort=+
+
