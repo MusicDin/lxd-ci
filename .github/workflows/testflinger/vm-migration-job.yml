@@ -23,5 +23,9 @@ test_data:
     # ensure device is available before continuing
     wait_for_ssh --allow-degraded
 
-    _run git clone --depth=1 https://github.com/canonical/lxd-ci
-    _run bash -c "cd lxd-ci && sudo ./bin/local-run tests/vm-migration latest/edge"
+    # _run git clone --depth=1 https://github.com/canonical/lxd-ci
+    _run git clone --depth=1 https://github.com/musicdin/lxd-ci --branch tests/live-migration
+    _run ls -la
+    _run ls -la lxd-ci
+    _run ls -la lxd-ci/bin
+    _run bash -c "cd lxd-ci && ./bin/local-run tests/vm-migration latest/edge"
