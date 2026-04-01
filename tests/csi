@@ -1,0 +1,59 @@
+#!/bin/bash
+set -eux
+
+# Kubernetes cluster name used as a prefix for LXD and k8s resources.
+CLUSTER_NAME="${1:-lxd-csi}"
+
+echo "==> Install LXD"
+install_lxd
+lxd init --auto
+
+echo "==> Install dependencies"
+install_deps git
+
+if ! command -v kubectl > /dev/null; then
+    snap install kubectl --classic
+fi
+
+if ! command -v helm > /dev/null; then
+    snap install helm --classic
+fi
+
+if ! command -v go > /dev/null; then
+    snap install go --classic
+fi
+
+echo "==> Clone lxd-csi-driver"
+[ -d lxd-csi-driver ] && rm -rf lxd-csi-driver
+git clone --depth=1 --single-branch https://github.com/canonical/lxd-csi-driver.git
+
+echo "==> Patch lxd-csi-driver to use local helpers"
+HELPERS_PATH="$(realpath "$(dirname "${BASH_SOURCE[0]}")/../bin/helpers")"
+
+sed -i "s|curl -fsSL https://raw.githubusercontent.com/canonical/lxd-ci/refs/heads/main/bin/helpers|cat \"${HELPERS_PATH}\"|" \
+    lxd-csi-driver/.github/actions/setup-k8s/k8s.sh
+
+echo "==> Deploy Kubernetes cluster with LXD CSI driver"
+export K8S_CLUSTER_NAME="${CLUSTER_NAME}"
+export K8S_SNAP_CHANNEL="${K8S_SNAP_CHANNEL:-latest/edge}"
+export K8S_CSI_IMAGE_TAG="${LXD_CSI_IMAGE_TAG:-latest-edge}"
+export K8S_NODE_COUNT="${K8S_NODE_COUNT:-2}"
+export K8S_KUBECONFIG_PATH
+K8S_KUBECONFIG_PATH="$(realpath lxd-csi-driver)/.kube/${CLUSTER_NAME}.yml"
+bash lxd-csi-driver/.github/actions/setup-k8s/k8s.sh deploy
+
+echo "==> Install ginkgo test runner"
+(
+    cd lxd-csi-driver
+    go install github.com/onsi/ginkgo/v2/ginkgo@"$(go list -m -f '{{.Version}}' github.com/onsi/ginkgo/v2)"
+)
+
+echo "==> Run e2e tests"
+export TEST_LXD_STORAGE_DRIVERS="${TEST_LXD_STORAGE_DRIVERS:-dir}"
+(cd lxd-csi-driver/test/e2e && ginkgo -v --timeout 60m .)
+
+echo "==> Cleanup"
+bash lxd-csi-driver/.github/actions/setup-k8s/k8s.sh cleanup
+
+# shellcheck disable=SC2034
+FAIL=0
