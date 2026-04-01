@@ -367,6 +367,7 @@ createPowerFlexPool() (
 # createPowerStorePool: creates a new storage pool using the PowerStore driver.
 createPowerStorePool() (
   lxc storage create "${1}" powerstore \
+    powerstore.discovery="${POWERSTORE_DISCOVERY}" \
     powerstore.gateway="${POWERSTORE_GATEWAY}" \
     powerstore.gateway.verify="${POWERSTORE_GATEWAY_VERIFY:-true}" \
     powerstore.transport="${POWERSTORE_TRANSPORT:-tcp}" \
