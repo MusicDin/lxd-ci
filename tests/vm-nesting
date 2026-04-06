@@ -20,9 +20,10 @@ if echo "${LXD_SNAP_CHANNEL}" | grep -qE "^4\.0/"; then
     VMs=3
     nestedVMs=2
 
-    if modinfo zfs | grep -qE '^version:\s*2\.2\.'; then
+    zfsVersion="$(modinfo -F version zfs)"
+    if dpkg --compare-versions "${zfsVersion}" gt "2.2"; then
         storageDriver="lvm"
-        echo "${LXD_SNAP_CHANNEL} does not support ZFS 2.2, falling back to ${storageDriver}"
+        echo "${LXD_SNAP_CHANNEL} does not support ZFS ${zfsVersion}, falling back to ${storageDriver}"
     fi
 fi
 
