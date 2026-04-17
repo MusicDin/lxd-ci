@@ -20,6 +20,17 @@ lxc storage create default zfs
 # XXX: known DNS resolution on for .lxd domain with 24.04 instances
 IMAGE="${TEST_IMG:-ubuntu-daily:22.04}"
 
+can_test_ovn_forward_ping() {
+    # Jammy's ovn-host/ovn-central deb packages 22.03.3-0ubuntu0.22.04.1 and
+    # 22.03.8-0ubuntu0.22.04.1 regress ICMP reachability to forwarded addresses.
+    if [ "${OVN_SOURCE:-latest/edge}" != "deb" ]; then
+        return 0
+    fi
+
+    . /etc/os-release
+    [ "${VERSION_ID}" != "22.04" ]
+}
+
 ovn_basic_tests() {
     echo "==> basic"
     lxc network create lxdbr0 \
@@ -769,9 +780,12 @@ ovn_forward_tests() {
     timeout 5 grep -m1 ^SSH < /dev/tcp/2001:db8:1:2::1/22
 
     echo "==> Check forward is working by pinging it"
-    # XXX: ping used to work but doesn't anymore due to a regression in OVN in Jammy (22.03.3-0ubuntu0.22.04.1?)
-    #ping -nc1 -i0.1 -w2 192.0.2.1
-    #ping -nc1 -i0.1 -w2 2001:db8:1:2::1
+    if can_test_ovn_forward_ping; then
+        ping -nc1 -i0.1 -w2 192.0.2.1
+        ping -nc1 -i0.1 -w2 2001:db8:1:2::1
+    else
+        echo "Skipping OVN forward ping checks on ubuntu-22.04 with deb OVN due to the Jammy OVN regression"
+    fi
 
     echo "==> Check DNS TCP forwarding using default target rule"
     lxc exec u1 -- systemctl mask dnsmasq
