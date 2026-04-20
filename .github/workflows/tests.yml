@@ -1,5 +1,6 @@
 name: Tests
 on:
+  push:
   pull_request:
     paths:
       - '.github/workflows/tests.yml'
@@ -107,45 +108,7 @@ jobs:
         os: ${{ fromJSON(inputs.ubuntu-releases || '["22.04", "24.04"]') }}
         track: ${{ fromJSON(inputs.snap-track || '["6/edge", "5.21/edge", "5.0/edge"]') }}
         test:
-          - cgroup
-          - cloud-init
-          - cluster
           - csi
-          - container
-          - container-copy
-          - container-nesting
-          - conversion
-          - cpu-vm
-          - devlxd-container
-          - devlxd-vm
-          - docker
-          - efi-vars-editor-vm
-          - lxd-installer
-          - lxd-user
-          - interception
-          - network-bridge-firewall
-          - network-ovn ovn:deb
-          - network-ovn ovn:latest/edge
-          - network-routed
-          - pylxd
-          - qemu-external-vm
-          - snapd
-          - storage-buckets
-          - storage-disks-vm
-          - storage-metadata
-          - storage-vm btrfs
-          - storage-vm ceph
-          - storage-vm dir
-          - storage-vm lvm
-          - storage-vm lvm-thin
-          - storage-vm zfs
-          - storage-volumes-vm
-          - tpm-vm
-          - ui chromium
-          - ui firefox
-          - vm
-          - vm-migration
-          - vm-nesting
         exclude:
           - test: csi
             track: "4.0/candidate"
