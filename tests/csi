@@ -49,7 +49,7 @@ echo "==> Install ginkgo test runner"
 
 echo "==> Run e2e tests"
 export PATH="$(go env GOPATH)/bin:${PATH}"
-export TEST_LXD_STORAGE_DRIVERS="${TEST_LXD_STORAGE_DRIVERS:-dir}"
+export TEST_LXD_STORAGE_DRIVERS="${TEST_LXD_STORAGE_DRIVERS:-dir,btrfs,zfs,lvm}"
 (cd lxd-csi-driver/test/e2e && ginkgo -v --timeout 60m .)
 
 echo "==> Cleanup"
