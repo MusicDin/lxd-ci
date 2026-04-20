@@ -70,7 +70,7 @@ done
 echo "==> Check that there is no CPU pinning set"
 QEMU_PID=$(lxc info v1 | awk '/^PID:/ {print $2}')
 ! taskset --cpu-list -a -p "${QEMU_PID}" | grep -E ':\s+[0-9]+$' || false
-taskset --cpu-list -a -p "${QEMU_PID}" | grep "0-$((cpuCount-1))"
+taskset --cpu-list -a -p "${QEMU_PID}" | grep -E ":\s+0-$((cpuCount-1))$"
 
 # Set max CPU count
 lxc config set v1 limits.cpu="${cpuCount}"
