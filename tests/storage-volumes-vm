@@ -123,6 +123,8 @@ do
 	echo "==> Create custom block volume and attach it to VM"
 	if [ "${poolDriver}" != "powerflex" ] && [ "${poolDriver}" != "alletra" ]; then
 		lxc storage volume create "${poolName}" vol1 --type=block size=4MiB
+	elif [ "${poolDriver}" = "powerstore" ]; then
+		lxc storage volume create "${poolName}" vol1 --type=block size=16MiB
 	else
 		lxc storage volume create "${poolName}" vol1 --type=block size=8GiB
 	fi
