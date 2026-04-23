@@ -546,8 +546,9 @@ for poolDriver in $poolDriverList; do
 
         echo "==> Copy to different storage pool with different driver and check size"
         dstPoolDriver=zfs # Use ZFS storage pool as that has fixed volumes not files.
-        if [ "${poolDriver}" = "zfs" ]; then
-                dstPoolDriver=lvm # Use something different when testing ZFS.
+        if [ "${poolDriver}" = "zfs" ] || [ "${poolDriver}" = "powerstore" ]; then
+                # Use something different when testing ZFS.
+                dstPoolDriver=lvm
         fi
 
         lxc storage create "${poolName}-${dstPoolDriver}" "${dstPoolDriver}" size=20GiB
